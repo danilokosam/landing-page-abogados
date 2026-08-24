@@ -6,20 +6,18 @@ import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
 const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consulta.');
 ---
 
-<section class="border-b border-slate-200 bg-slate-50">
+<section class="border-border bg-muted border-b">
   <div
     class="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:px-8 lg:py-28"
   >
     <div>
-      <p class="text-sm font-semibold tracking-widest text-amber-800 uppercase">
-        Abogados en Madrid
-      </p>
+      <p class="text-accent text-sm font-semibold tracking-widest uppercase">Abogados en Madrid</p>
       <h1
-        class="mt-4 font-serif text-4xl leading-tight font-semibold text-balance text-slate-900 sm:text-5xl"
+        class="text-foreground mt-4 font-serif text-4xl leading-tight font-semibold text-balance sm:text-5xl"
       >
         Asesoramiento jurídico claro, en el momento en que lo necesita
       </h1>
-      <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
+      <p class="text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed">
         {negocio.descripcionCorta}
       </p>
 
@@ -28,14 +26,14 @@ const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consu
           href={enlaceWhatsApp}
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+          class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 focus-visible:outline-whatsapp inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <Icon name="lucide:message-circle" class="h-5 w-5" aria-hidden="true" />
           Agendar una consulta por WhatsApp
         </a>
         <a
           href="#servicios"
-          class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-6 py-3.5 text-base font-semibold text-slate-800 transition-colors hover:border-slate-400 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+          class="border-border text-foreground hover:border-primary hover:bg-card focus-visible:outline-ring inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3.5 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           Ver áreas de práctica
           <Icon name="lucide:arrow-right" class="h-4 w-4" aria-hidden="true" />
@@ -44,23 +42,27 @@ const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consu
     </div>
 
     <dl
-      class="grid grid-cols-2 gap-6 border-t border-slate-200 pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12"
+      class="border-border grid grid-cols-2 gap-6 border-t pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12"
     >
       <div>
-        <dt class="font-serif text-3xl font-semibold text-slate-900">2</dt>
-        <dd class="mt-1 text-sm text-slate-600">Socios fundadores, disponibles en cada caso</dd>
+        <dt class="text-foreground font-serif text-3xl font-semibold">2</dt>
+        <dd class="text-muted-foreground mt-1 text-sm">
+          Socios fundadores, disponibles en cada caso
+        </dd>
       </div>
       <div>
-        <dt class="font-serif text-3xl font-semibold text-slate-900">20+</dt>
-        <dd class="mt-1 text-sm text-slate-600">Años de experiencia combinada</dd>
+        <dt class="text-foreground font-serif text-3xl font-semibold">20+</dt>
+        <dd class="text-muted-foreground mt-1 text-sm">Años de experiencia combinada</dd>
       </div>
       <div>
-        <dt class="font-serif text-3xl font-semibold text-slate-900">6</dt>
-        <dd class="mt-1 text-sm text-slate-600">Áreas de práctica cubiertas</dd>
+        <dt class="text-foreground font-serif text-3xl font-semibold">6</dt>
+        <dd class="text-muted-foreground mt-1 text-sm">Áreas de práctica cubiertas</dd>
       </div>
       <div>
-        <dt class="font-serif text-3xl font-semibold text-slate-900">24h</dt>
-        <dd class="mt-1 text-sm text-slate-600">Tiempo de respuesta habitual por WhatsApp</dd>
+        <dt class="text-foreground font-serif text-3xl font-semibold">24h</dt>
+        <dd class="text-muted-foreground mt-1 text-sm">
+          Tiempo de respuesta habitual por WhatsApp
+        </dd>
       </div>
     </dl>
   </div>

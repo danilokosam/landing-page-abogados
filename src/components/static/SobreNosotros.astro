@@ -9,14 +9,14 @@ const sociosConContenido = await Promise.all(
 );
 ---
 
-<section id="sobre-nosotros" class="scroll-mt-20 border-b border-slate-200 bg-white">
+<section id="sobre-nosotros" class="border-border bg-background scroll-mt-20 border-b">
   <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
     <div class="max-w-2xl">
-      <p class="text-sm font-semibold tracking-widest text-amber-800 uppercase">Trayectoria</p>
-      <h2 class="mt-3 font-serif text-3xl font-semibold text-balance text-slate-900 sm:text-4xl">
+      <p class="text-accent text-sm font-semibold tracking-widest uppercase">Trayectoria</p>
+      <h2 class="text-foreground mt-3 font-serif text-3xl font-semibold text-balance sm:text-4xl">
         Sobre nosotros
       </h2>
-      <p class="mt-4 text-lg leading-relaxed text-slate-600">
+      <p class="text-muted-foreground mt-4 text-lg leading-relaxed">
         Un despacho de dos socios que combina más de dos décadas de práctica jurídica en Madrid, con
         un trato directo y personal en cada caso.
       </p>
@@ -25,7 +25,7 @@ const sociosConContenido = await Promise.all(
     <div class="mt-14 grid gap-10 md:grid-cols-2 md:gap-8">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article class="flex flex-col gap-6 rounded-2xl border border-slate-200 p-6 sm:flex-row sm:p-8">
+          <article class="border-border bg-card flex flex-col gap-6 rounded-2xl border p-6 sm:flex-row sm:p-8">
             <Image
               src={socio.data.foto}
               alt={`Retrato de ${socio.data.nombre}`}
@@ -34,24 +34,24 @@ const sociosConContenido = await Promise.all(
               class="h-28 w-28 shrink-0 rounded-full object-cover"
             />
             <div>
-              <h3 class="font-serif text-xl font-semibold text-slate-900">{socio.data.nombre}</h3>
-              <p class="text-sm font-medium text-amber-800">{socio.data.cargo}</p>
+              <h3 class="text-foreground font-serif text-xl font-semibold">{socio.data.nombre}</h3>
+              <p class="text-accent text-sm font-medium">{socio.data.cargo}</p>
 
-              <div class="prose-p:my-3 mt-3 text-sm leading-relaxed text-slate-600">
+              <div class="prose-p:my-3 text-muted-foreground mt-3 text-sm leading-relaxed">
                 <Content />
               </div>
 
               <dl class="mt-5 space-y-3 text-sm">
                 <div>
-                  <dt class="flex items-center gap-1.5 font-medium text-slate-800">
+                  <dt class="text-foreground flex items-center gap-1.5 font-medium">
                     <Icon
                       name="lucide:graduation-cap"
-                      class="h-4 w-4 text-slate-400"
+                      class="text-muted-foreground h-4 w-4"
                       aria-hidden="true"
                     />
                     Formación
                   </dt>
-                  <dd class="mt-1 space-y-0.5 text-slate-600">
+                  <dd class="text-muted-foreground mt-1 space-y-0.5">
                     {socio.data.formacion.map((item) => (
                       <p>{item}</p>
                     ))}
@@ -59,11 +59,15 @@ const sociosConContenido = await Promise.all(
                 </div>
 
                 <div>
-                  <dt class="flex items-center gap-1.5 font-medium text-slate-800">
-                    <Icon name="lucide:award" class="h-4 w-4 text-slate-400" aria-hidden="true" />
+                  <dt class="text-foreground flex items-center gap-1.5 font-medium">
+                    <Icon
+                      name="lucide:award"
+                      class="text-muted-foreground h-4 w-4"
+                      aria-hidden="true"
+                    />
                     Acreditaciones
                   </dt>
-                  <dd class="mt-1 space-y-0.5 text-slate-600">
+                  <dd class="text-muted-foreground mt-1 space-y-0.5">
                     {socio.data.acreditaciones.map((item) => (
                       <p>{item}</p>
                     ))}
@@ -73,7 +77,7 @@ const sociosConContenido = await Promise.all(
 
               <ul class="mt-5 flex flex-wrap gap-2">
                 {socio.data.especialidades.map((especialidad) => (
-                  <li class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  <li class="bg-accent/10 text-accent border-accent/20 rounded-full border px-3 py-1 text-xs font-medium">
                     {especialidad}
                   </li>
                 ))}

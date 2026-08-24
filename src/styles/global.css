@@ -1,5 +1,142 @@
 @import 'tailwindcss';
 
+/*
+ * Sistema de color — fuente única de verdad.
+ * Toda la identidad visual del sitio se cambia editando los valores
+ * de esta sección; los componentes solo consumen clases semánticas de
+ * Tailwind (bg-background, text-foreground, bg-primary, border-border,
+ * text-muted-foreground, bg-whatsapp...), nunca colores hardcodeados
+ * (bg-slate-100, text-amber-800, etc.).
+ *
+ * Paleta clara: hueso cálido + navy corporativo + bronce/cognac apagado
+ * como acento de prestigio. Paleta oscura: pizarra profunda (no negro
+ * puro) + el mismo navy aclarado para mantener contraste en botones.
+ * Todos los pares texto/fondo están verificados en AA (4.5:1) o mejor;
+ * la mayoría supera AAA (7:1).
+ */
+
+:root {
+  --background: #faf7f1; /* hueso cálido, no blanco puro */
+  --foreground: #1b2433; /* navy-carbón, no negro puro */
+
+  --card: #ffffff; /* superficie de tarjetas, más clara que el fondo para dar profundidad */
+  --card-foreground: #1b2433;
+
+  --primary: #1b2a4a; /* navy corporativo — autoridad, seriedad */
+  --primary-foreground: #f8f5ee;
+
+  --accent: #7c5a34; /* bronce/cognac apagado — insignias y detalles de prestigio */
+  --accent-foreground: #ffffff;
+
+  --muted: #f1ece1; /* superficie para secciones alternas */
+  --muted-foreground: #5b6472; /* texto secundario/de apoyo */
+
+  --border: #d8cfb8; /* hairline cálido y sutil */
+  --ring: var(--primary); /* foco de teclado */
+
+  /* Verde funcional para el canal de conversión (WhatsApp): reconocible
+	   a propósito, deliberadamente separado del acento decorativo. */
+  --whatsapp: #167c45;
+  --whatsapp-foreground: #ffffff;
+}
+
+/*
+ * Banda del Footer — deliberadamente invariante entre tema claro y
+ * oscuro (siempre navy oscuro con texto claro), como ancla visual fija
+ * de la marca. No se sobrescribe en los bloques de modo oscuro de abajo.
+ */
+:root {
+  --footer-background: #1b2433;
+  --footer-foreground: #f8f5ee;
+  --footer-muted-foreground: #b7bec9;
+  --footer-border: #2a3550;
+}
+
+/* Modo oscuro automático (preferencia del sistema), salvo que .light lo fuerce */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: #12151b;
+    --foreground: #ece7da;
+
+    --card: #1a1f28;
+    --card-foreground: #ece7da;
+
+    --primary: #7b92b8;
+    --primary-foreground: #10141c;
+
+    --accent: #c89b5c;
+    --accent-foreground: #14181f;
+
+    --muted: #1e232c;
+    --muted-foreground: #9ba3af;
+
+    --border: #2b323d;
+    --ring: var(--primary);
+
+    --whatsapp: #22a360;
+    --whatsapp-foreground: #0c2016;
+  }
+}
+
+/* Modo oscuro forzado explícitamente (p. ej. un futuro selector de tema) */
+.dark {
+  --background: #12151b;
+  --foreground: #ece7da;
+
+  --card: #1a1f28;
+  --card-foreground: #ece7da;
+
+  --primary: #7b92b8;
+  --primary-foreground: #10141c;
+
+  --accent: #c89b5c;
+  --accent-foreground: #14181f;
+
+  --muted: #1e232c;
+  --muted-foreground: #9ba3af;
+
+  --border: #2b323d;
+  --ring: var(--primary);
+
+  --whatsapp: #22a360;
+  --whatsapp-foreground: #0c2016;
+}
+
+/* Registro de los tokens ante Tailwind v4 — genera las utilidades semánticas */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
+
+  --color-footer: var(--footer-background);
+  --color-footer-foreground: var(--footer-foreground);
+  --color-footer-muted-foreground: var(--footer-muted-foreground);
+  --color-footer-border: var(--footer-border);
+}
+
+/* Superficie base de la página — evita que el fondo dependa del tema del host */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 /* Scroll suave para los anclajes de navegación (#sobre-nosotros, etc.) */
 html {
   scroll-behavior: smooth;

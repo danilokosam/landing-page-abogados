@@ -5,16 +5,14 @@ import TarjetaServicio from './TarjetaServicio.astro';
 const servicios = (await getCollection('servicios')).sort((a, b) => a.data.orden - b.data.orden);
 ---
 
-<section id="servicios" class="scroll-mt-20 border-b border-slate-200 bg-slate-50">
+<section id="servicios" class="border-border bg-muted scroll-mt-20 border-b">
   <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
     <div class="max-w-2xl">
-      <p class="text-sm font-semibold tracking-widest text-amber-800 uppercase">
-        Áreas de práctica
-      </p>
-      <h2 class="mt-3 font-serif text-3xl font-semibold text-balance text-slate-900 sm:text-4xl">
+      <p class="text-accent text-sm font-semibold tracking-widest uppercase">Áreas de práctica</p>
+      <h2 class="text-foreground mt-3 font-serif text-3xl font-semibold text-balance sm:text-4xl">
         Servicios y honorarios
       </h2>
-      <p class="mt-4 text-lg leading-relaxed text-slate-600">
+      <p class="text-muted-foreground mt-4 text-lg leading-relaxed">
         Cada área incluye una primera consulta a un precio cerrado, para que sepa desde el principio
         con qué está contando.
       </p>
