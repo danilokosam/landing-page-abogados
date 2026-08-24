@@ -34,14 +34,24 @@ Implementado en `src/styles/global.css` mediante variables CSS + `@theme inline`
 1. **`--whatsapp`/`--whatsapp-foreground` es un token de acción funcional, separado de `accent`.** El verde de WhatsApp existe por reconocibilidad de marca (el usuario debe identificar de un vistazo "este botón abre WhatsApp"), no por decisión estética del despacho — mezclarlo con el acento bronce le haría perder ese reconocimiento inmediato.
 2. **El Footer usa una banda de color fija (`--footer-*`), invariante entre tema claro y oscuro.** Es una decisión de dirección de arte (un ancla de marca siempre en navy oscuro, como un pie de página impreso), no un error de la implementación de modo oscuro — por eso esos cuatro tokens se definen una sola vez en `:root` y no se sobrescriben en los bloques de modo oscuro.
 
-**Pendiente de esta fase (no incluido en este encargo):** tipografía de marca (par de fuentes propio) y ritmo vertical — el sitio sigue usando `font-serif`/`font-sans` por defecto de Tailwind. Queda como continuación natural de Fase 3.
+**Tipografía:** Playfair Display (`font-serif` — títulos, cifras destacadas, porte editorial) + Plus Jakarta Sans (`font-sans` — cuerpo de texto), autoservidas vía `@fontsource` (sin peticiones a Google Fonts en runtime; se verificó en el build que no queda ninguna referencia a `fonts.googleapis.com`/`fonts.gstatic.com`). Registradas en el mismo `@theme inline` que los colores, así que todo componente que ya usaba la utilidad `font-serif` de Tailwind heredó la fuente nueva sin tocar una sola clase — el cambio fue enteramente en `global.css`.
+
+**Selector de tema (`ThemeToggle.astro`, en `components/interactive/`):** botón con iconos sol/luna (Lucide) en el Header, alterna una clase explícita `dark`/`light` en `<html>` y la persiste en `localStorage`. Anti-parpadeo (FOUC) resuelto con un `<script is:inline>` bloqueante como primer elemento de `<head>` en `BaseLayout.astro` — lee `localStorage` y, si no hay preferencia guardada, `prefers-color-scheme`, y aplica la clase antes del primer pintado; se verificó visualmente recargando con "oscuro" ya elegido y no hay flash de tema claro. El bloque `@media (prefers-color-scheme: dark)` de la paleta se conserva como red de seguridad para navegadores con JS desactivado. Se añadió `@custom-variant dark (&:where(.dark, .dark *));` a Tailwind (modo oscuro por clase en vez de por media query) — usado puntualmente para el propio ícono sol/luna del toggle; el resto del sistema de color sigue resolviéndose por CSS puro y no depende de esta variante.
+
+**Borde inferior del Header — evaluación técnica (tres alternativas consideradas):**
+
+1. _Barra de progreso de scroll_ — descartada: requiere JS (o la API moderna `animation-timeline: scroll()`, con soporte de navegador todavía desigual en Safari), y una barra que crece con el scroll lee más a "blog/SaaS" que a autoridad legal.
+2. _Transición de opacidad del borde al hacer scroll_ — descartada: variante más sutil de la anterior, pero sigue exigiendo JS (listener de scroll u `IntersectionObserver`) para un beneficio marginal, y contradice la decisión ya tomada en este proyecto de reservar todo lo scroll-driven para GSAP en Fase 4.
+3. **Gradiente de acento con resplandor sutil, estático — elegida.** Línea de 1px con degradado `border → accent → border` centrado, más un `box-shadow` muy suave en el color de acento vía `color-mix()`. Cero JS, cero coste de rendimiento, se adapta solo entre tema claro/oscuro porque referencia las variables de color existentes. Implementada como pseudo-elemento `.site-header::after` en `global.css` (no como utilidades Tailwind sueltas, por legibilidad de un detalle tan específico).
+
+La razón de fondo para descartar 1 y 2: el proyecto ya tiene una decisión arquitectónica explícita de que todo lo animado/scroll-driven se implementa en Fase 4 con GSAP, como capa de acabado final sobre una base ya cerrada — traer un efecto scroll-driven a Fase 3 (aunque fuera CSS-only) habría contradicho esa disciplina de fases sin necesidad, ya que la opción estática cumple el pedido ("toque distintivo") igual de bien y con más sobriedad.
 
 ## Roadmap de fases
 
 - [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. _(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)_
 - [x] **Fase 1 — Setup y arquitectura base.** Astro + TypeScript estricto, Tailwind, Content Collections, árbol de carpetas, `PROJECT_STATE.md`.
 - [x] **Fase 2 — Estructura estática.** Componentes `.astro` de `components/static/` ensamblados en `index.astro`, sitio completamente navegable y responsive, sin una línea de GSAP. Construida sobre contenido ficticio (ver abajo), no sobre el insumo real de Fase 0.
-- [x] **Fase 3 — Sistema visual y diseño (paleta y tokens).** Sistema de color completo con variables CSS + `@theme inline` de Tailwind v4 (ver "Decisión de sistema de diseño" abajo), modo oscuro automático (`prefers-color-scheme`) y forzable (`.dark`), todos los componentes migrados a clases semánticas. **Tipografía de marca queda pendiente** — esta fase se ejecutó en dos entregas y solo se completó la parte de color; sigue usándose `font-serif`/`font-sans` por defecto de Tailwind.
+- [x] **Fase 3 — Sistema visual y diseño (completa).** Sistema de color con variables CSS + `@theme inline`, modo oscuro automático (`prefers-color-scheme`) y forzable (`.dark`), todos los componentes en tokens semánticos, tipografía de marca (Playfair Display + Plus Jakarta Sans, autoservida vía `@fontsource`), `ThemeToggle.astro` con persistencia en `localStorage` y script bloqueante anti-parpadeo, y borde inferior de acento en el Header. Ejecutada en dos entregas — ver "Sistema de diseño" abajo para el detalle completo de ambas.
 - [ ] **Fase 4 — Animación e interacción.** Implementación de GSAP/ScrollTrigger según la tabla de microinteracciones de la propuesta.
 - [ ] **Fase 5 — SEO, Schema y accesibilidad.** JSON-LD `LegalService` (generador ya existe en `schema.ts`, falta invocarlo desde una página), OpenGraph (imagen dedicada), auditoría de teclado/contraste/alt.
 - [ ] **Fase 6 — Testing y QA.** Lighthouse, prueba de enlaces WhatsApp, `prefers-reduced-motion`, cross-browser (prioridad Safari iOS).
@@ -54,6 +64,16 @@ Para no bloquear el avance estructural mientras el cliente recopila su material 
 **Antes de desplegar a producción o compartir una vista previa con el cliente**, todo esto debe reemplazarse por datos reales (Fase 0). Buscar `Duarte & Iglesias`, `duarteiglesiasabogados.es` y `+34612345678` en el repo para localizar cada punto de reemplazo.
 
 ## Estado actual
+
+**Completado (24 de agosto de 2026, sesión de tipografía + theme toggle + header — cierre de Fase 3):**
+
+- Fuentes autoservidas instaladas vía `@fontsource/playfair-display` y `@fontsource/plus-jakarta-sans` (pesos 400/500/600/700 según uso real); registradas como `--font-serif`/`--font-sans` en el `@theme inline` de `global.css`. Verificado en `dist/`: 24 archivos `.woff2` propios, cero referencias a `fonts.googleapis.com`/`fonts.gstatic.com`.
+- `ThemeToggle.astro` nuevo en `src/components/interactive/` (primer componente real de esa carpeta) — botón sol/luna, persiste en `localStorage`, accesible por teclado (`<button>` nativo, `aria-label`/`aria-pressed` dinámicos, `focus-visible`).
+- Script anti-FOUC bloqueante (`is:inline`) agregado como primer elemento de `<head>` en `BaseLayout.astro`.
+- `@custom-variant dark (&:where(.dark, .dark *));` agregado a `global.css` — modo oscuro por clase para las utilidades `dark:` de Tailwind, usado en el ícono del toggle; el resto de la paleta sigue sin depender de esto.
+- `Header.astro` reestructurado: `ThemeToggle` integrado junto al CTA de WhatsApp, tamaños de botón armonizados (toggle y hamburguesa ambos `h-9 w-9`), espaciado entre nav/toggle/CTA reorganizado en un clúster derecho explícito en vez de `justify-between` a 4 vías.
+- Borde inferior del Header rediseñado como gradiente de acento con resplandor sutil (pseudo-elemento `.site-header::after`, CSS puro) — ver evaluación de las tres alternativas consideradas arriba.
+- Verificado: `npm run format`, `npx astro check` (0 errores), `npx astro build` (limpio, 24 fuentes bundleadas), y revisión visual en navegador — toggle claro↔oscuro probado (incluida recarga con preferencia ya guardada, sin parpadeo), tipografía Playfair/Jakarta renderizando correctamente, borde de acento visible y sutil en ambos temas. La verificación del layout **móvil** del Header quedó solo a nivel de código (clases `md:flex`/`md:hidden`/`md:inline-flex` confirmadas en el CSS compilado) — la herramienta de redimensionado de ventana del navegador no respondió en este entorno; recomendable una revisión visual manual en un dispositivo o DevTools antes de dar el Header por definitivamente cerrado.
 
 **Completado (24 de agosto de 2026, sesión de sistema de diseño):**
 
@@ -83,9 +103,9 @@ Para no bloquear el avance estructural mientras el cliente recopila su material 
 **Pendiente para la próxima sesión:**
 
 1. Insumo real del cliente (Fase 0, sigue abierta): bios, fotos reales, honorarios definitivos, número de WhatsApp real, dirección/horario — y reemplazo de todo el contenido ficticio listado arriba.
-2. Fase 3 — tipografía de marca: elegir un par de fuentes propio (hoy el sitio usa `font-serif`/`font-sans` por defecto de Tailwind; la paleta y los tokens de color ya están cerrados).
+2. Revisión visual manual del Header en móvil real/DevTools (ver nota de verificación arriba) — el redimensionado de ventana no funcionó en este entorno de sesión.
 3. Invocar `generarLegalServiceSchema()` (ya existe en `schema.ts`) desde `BaseLayout.astro` o `index.astro` e inyectarlo como `<script type="application/ld+json">` — quedó implementado pero no conectado.
 4. Imagen OpenGraph dedicada (1200×630) — `BaseLayout.astro` ya emite las meta tags pero sin `og:image` todavía.
-5. Fase 4 — animaciones GSAP/ScrollTrigger reales, según la tabla de microinteracciones de la propuesta.
+5. Fase 4 — animaciones GSAP/ScrollTrigger reales, según la tabla de microinteracciones de la propuesta. Fase 3 queda completamente cerrada: paleta, tokens, tipografía y theme toggle.
 
-**No iniciado deliberadamente en esta sesión:** animaciones GSAP (Fase 4), tipografía de marca (resto de Fase 3) — por instrucción explícita de mantener esta sesión limitada al sistema de color.
+**No iniciado deliberadamente en esta sesión:** animaciones GSAP (Fase 4) — por instrucción explícita de mantener esta sesión limitada al Header, la tipografía y el selector de tema.

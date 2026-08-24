@@ -19,6 +19,24 @@ const { title, description } = Astro.props;
 <html lang="es">
   <head>
     <meta charset="utf-8" />
+    <script is:inline>
+      // Bloqueante a propósito: resuelve el tema antes del primer pintado
+      // para evitar el parpadeo de tema incorrecto (FOUC). Duplica una
+      // pequeña porción de la lógica de ThemeToggle.astro porque debe
+      // ejecutarse de forma síncrona, sin esperar a ningún módulo.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var isDark = stored
+            ? stored === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.add(isDark ? 'dark' : 'light');
+        } catch (error) {
+          // localStorage/matchMedia inaccesibles — se conserva el tema
+          // claro por defecto en vez de romper la carga de la página.
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />

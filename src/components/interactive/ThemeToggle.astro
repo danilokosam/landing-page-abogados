@@ -1,0 +1,47 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  class="text-foreground hover:bg-muted focus-visible:outline-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+  aria-label="Cambiar a modo oscuro"
+  aria-pressed="false"
+>
+  <Icon name="lucide:sun" class="h-[18px] w-[18px] dark:hidden" aria-hidden="true" />
+  <Icon name="lucide:moon" class="hidden h-[18px] w-[18px] dark:block" aria-hidden="true" />
+</button>
+
+<script>
+  const STORAGE_KEY = 'theme';
+  const root = document.documentElement;
+  const button = document.getElementById('theme-toggle');
+
+  function isDarkActive(): boolean {
+    if (root.classList.contains('dark')) return true;
+    if (root.classList.contains('light')) return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function syncLabel(): void {
+    const dark = isDarkActive();
+    button?.setAttribute('aria-pressed', String(dark));
+    button?.setAttribute('aria-label', dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+  }
+
+  button?.addEventListener('click', () => {
+    const next = isDarkActive() ? 'light' : 'dark';
+    root.classList.remove('light', 'dark');
+    root.classList.add(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      // localStorage inaccesible (navegación privada, etc.) — el cambio
+      // sigue funcionando para la sesión actual, solo no se recuerda.
+    }
+    syncLabel();
+  });
+
+  syncLabel();
+</script>

@@ -1,6 +1,28 @@
 @import 'tailwindcss';
 
 /*
+ * Tipografía — autoservida vía @fontsource (sin peticiones a Google Fonts
+ * en runtime). Playfair Display para títulos (porte editorial, autoridad);
+ * Plus Jakarta Sans para texto de cuerpo (neutra, cómoda en lectura larga).
+ * Solo se cargan los pesos realmente usados por los componentes.
+ */
+@import '@fontsource/playfair-display/500.css';
+@import '@fontsource/playfair-display/600.css';
+@import '@fontsource/playfair-display/700.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+
+/*
+ * Modo oscuro por clase (no por media query) para las utilidades `dark:`
+ * de Tailwind — usado puntualmente (p. ej. el ícono del ThemeToggle). El
+ * sistema de color de abajo NO depende de esto; sigue resolviéndose por
+ * CSS puro vía las variables --background/--foreground/etc.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
  * Sistema de color — fuente única de verdad.
  * Toda la identidad visual del sitio se cambia editando los valores
  * de esta sección; los componentes solo consumen clases semánticas de
@@ -78,7 +100,7 @@
   }
 }
 
-/* Modo oscuro forzado explícitamente (p. ej. un futuro selector de tema) */
+/* Modo oscuro forzado explícitamente — vía la clase que aplica ThemeToggle.astro */
 .dark {
   --background: #12151b;
   --foreground: #ece7da;
@@ -129,12 +151,46 @@
   --color-footer-foreground: var(--footer-foreground);
   --color-footer-muted-foreground: var(--footer-muted-foreground);
   --color-footer-border: var(--footer-border);
+
+  --font-serif: 'Playfair Display', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-sans:
+    'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Superficie base de la página — evita que el fondo dependa del tema del host */
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/*
+ * Borde inferior del Header — línea de acento con resplandor sutil,
+ * estática a propósito (ver PROJECT_STATE.md, evaluación de alternativas
+ * de Fase 3: se descartó una barra de progreso de scroll y una transición
+ * de opacidad por requerir JS y por leer más "SaaS" que "despacho legal
+ * sobrio"; esta opción da la firma visual pedida sin animación ni coste
+ * de rendimiento). Se referencia a las variables de color, así que se
+ * adapta solo entre tema claro y oscuro.
+ */
+.site-header {
+  position: relative;
+}
+.site-header::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border) 12%,
+    var(--accent) 50%,
+    var(--border) 88%,
+    transparent
+  );
+  box-shadow: 0 1px 8px -1px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 /* Scroll suave para los anclajes de navegación (#sobre-nosotros, etc.) */
