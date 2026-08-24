@@ -1,0 +1,43 @@
+---
+/**
+ * Layout base único para el sitio (una sola página).
+ * Estructura de documento + metadata; sin maquetación de secciones
+ * de UI — esas se componen en src/pages/index.astro a partir de
+ * Fase 2 (ver PROJECT_STATE.md).
+ */
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+
+		<!-- OpenGraph — completar con imagen dedicada en Fase 5 -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+	</head>
+	<body>
+		<slot />
+
+		<script>
+			// Punto único de inicialización de animaciones (Fase 4).
+			// import { inicializarRevealsDeScroll } from '../lib/gsap/animations';
+			// inicializarRevealsDeScroll();
+		</script>
+	</body>
+</html>
