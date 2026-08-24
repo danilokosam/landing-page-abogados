@@ -7,8 +7,11 @@
 
 import { negocio } from './negocio';
 
-export function construirEnlaceWhatsApp(mensaje: string, numero: string = negocio.telefonoWhatsapp): string {
-	const numeroLimpio = numero.replace(/[^\d]/g, '');
-	const mensajeCodificado = encodeURIComponent(mensaje);
-	return `https://wa.me/${numeroLimpio}?text=${mensajeCodificado}`;
+export function construirEnlaceWhatsApp(
+  mensaje: string,
+  numero: string = negocio.telefonoWhatsapp,
+): string {
+  const numeroLimpio = numero.replace(/[^\d]/g, '');
+  const mensajeCodificado = encodeURIComponent(mensaje);
+  return `https://wa.me/${numeroLimpio}?text=${mensajeCodificado}`;
 }

@@ -22,7 +22,7 @@ Contexto completo y justificación de cada decisión: ver la Propuesta de Arquit
 
 ## Roadmap de fases
 
-- [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. *(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)*
+- [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. _(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)_
 - [x] **Fase 1 — Setup y arquitectura base.** Astro + TypeScript estricto, Tailwind, Content Collections, árbol de carpetas, `PROJECT_STATE.md`.
 - [x] **Fase 2 — Estructura estática.** Componentes `.astro` de `components/static/` ensamblados en `index.astro`, sitio completamente navegable y responsive, sin una línea de GSAP. Construida sobre contenido ficticio (ver abajo), no sobre el insumo real de Fase 0.
 - [ ] **Fase 3 — Sistema visual y diseño.** Tipografía propia (par de fuentes), paleta de marca vía `@theme` de Tailwind, ritmo vertical, estados de componentes; revisión de contraste WCAG. La Fase 2 usó la paleta y tipografía por defecto de Tailwind (`slate`/`amber`/`emerald`, fuentes del sistema) deliberadamente, para no anticipar decisiones de marca que le corresponden a esta fase.

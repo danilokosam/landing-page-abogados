@@ -11,23 +11,23 @@
 import { gsap, respetaMovimiento } from './setup';
 
 export function inicializarRevealsDeScroll(): void {
-	respetaMovimiento.add('(prefers-reduced-motion: no-preference)', () => {
-		const elementos = gsap.utils.toArray<HTMLElement>('[data-animate="fade-up"]');
+  respetaMovimiento.add('(prefers-reduced-motion: no-preference)', () => {
+    const elementos = gsap.utils.toArray<HTMLElement>('[data-animate="fade-up"]');
 
-		elementos.forEach((el) => {
-			gsap.from(el, {
-				y: 16,
-				opacity: 0,
-				duration: 0.5,
-				ease: 'power2.out',
-				scrollTrigger: {
-					trigger: el,
-					start: 'top 85%',
-					once: true,
-				},
-			});
-		});
-	});
+    elementos.forEach((el) => {
+      gsap.from(el, {
+        y: 16,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          once: true,
+        },
+      });
+    });
+  });
 }
 
 // TODO(fase 4): stagger del hero, contador numérico de cifras de
