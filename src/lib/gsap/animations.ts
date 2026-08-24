@@ -10,18 +10,62 @@
 // ScrollTrigger ya esté registrado antes de usar la opción `scrollTrigger`.
 import { gsap, respetaMovimiento } from './setup';
 
+/**
+ * Revelados de scroll para las secciones que aún no tenían animación
+ * propia (Sobre Nosotros, Servicios). Igual que inicializarEntradaHero(),
+ * el estado inicial oculto vive solo en global.css — esta función
+ * únicamente anima HACIA el estado visible (gsap.to), nunca declara el
+ * "from", para no duplicar valores entre CSS y JS.
+ *
+ * Dos convenciones de atributo, desacopladas de clases de utilidad:
+ *   - data-reveal="left" | "right" | "up" — bloque único que entra
+ *     desde un lado u desde abajo.
+ *   - data-reveal-grid — el elemento en sí no se anima; se anima cada
+ *     uno de sus hijos directos con stagger (grid de TarjetaServicio).
+ * Cada trigger dispara una única vez (`once: true`) al entrar en el
+ * viewport, con el mismo umbral (`top 85%`) que el resto de
+ * animaciones del sitio.
+ */
 export function inicializarRevealsDeScroll(): void {
   respetaMovimiento.add('(prefers-reduced-motion: no-preference)', () => {
-    const elementos = gsap.utils.toArray<HTMLElement>('[data-animate="fade-up"]');
+    const ejeDireccion: Record<'left' | 'right' | 'up', 'x' | 'y'> = {
+      left: 'x',
+      right: 'x',
+      up: 'y',
+    };
 
-    elementos.forEach((el) => {
-      gsap.from(el, {
-        y: 16,
-        opacity: 0,
-        duration: 0.5,
+    (Object.keys(ejeDireccion) as Array<keyof typeof ejeDireccion>).forEach((direccion) => {
+      const eje = ejeDireccion[direccion];
+      const elementos = gsap.utils.toArray<HTMLElement>(`[data-reveal="${direccion}"]`);
+
+      elementos.forEach((el) => {
+        gsap.to(el, {
+          [eje]: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            once: true,
+          },
+        });
+      });
+    });
+
+    const grids = gsap.utils.toArray<HTMLElement>('[data-reveal-grid]');
+    grids.forEach((grid) => {
+      const items = gsap.utils.toArray<HTMLElement>(grid.children);
+      if (items.length === 0) return;
+
+      gsap.to(items, {
+        y: 0,
+        opacity: 1,
+        duration: 0.9,
         ease: 'power2.out',
+        stagger: 0.12,
         scrollTrigger: {
-          trigger: el,
+          trigger: grid,
           start: 'top 85%',
           once: true,
         },

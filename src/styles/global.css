@@ -241,4 +241,34 @@ html {
   html:not(.no-js) [data-hero-anim='title'] {
     clip-path: inset(0% 0% 100% 0%);
   }
+
+  /*
+   * Revelados de scroll genéricos — inicializarRevealsDeScroll() en
+   * src/lib/gsap/animations.ts. Mismo patrón que el Hero: el estado
+   * oculto vive solo aquí, GSAP únicamente anima hacia el estado
+   * visible (gsap.to), nunca declara el "from".
+   *   data-reveal="left"|"right" — bloques que entran desde un lado
+   *   (Sobre Nosotros: titular desde la izquierda, tarjetas desde la
+   *   derecha).
+   *   data-reveal="up" — encabezados de sección que entran desde abajo
+   *   (Servicios).
+   *   data-reveal-grid — el grid de tarjetas se revela con stagger; el
+   *   estado inicial se aplica a cada hijo directo, no al contenedor.
+   */
+  html:not(.no-js) [data-reveal='left'] {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  html:not(.no-js) [data-reveal='right'] {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  html:not(.no-js) [data-reveal='up'] {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  html:not(.no-js) [data-reveal-grid] > * {
+    opacity: 0;
+    transform: translateY(40px);
+  }
 }

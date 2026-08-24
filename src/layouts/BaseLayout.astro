@@ -81,16 +81,15 @@ const { title, description } = Astro.props;
       // triggers de las animaciones siguientes, para que disparen en
       // la posición de scroll correcta desde el primer fotograma.
       import { inicializarScrollSmoother } from '@/lib/gsap/scrollSmoother';
-      import { inicializarContadores, inicializarEntradaHero } from '@/lib/gsap/animations';
+      import {
+        inicializarContadores,
+        inicializarEntradaHero,
+        inicializarRevealsDeScroll,
+      } from '@/lib/gsap/animations';
       inicializarScrollSmoother();
       inicializarContadores();
       inicializarEntradaHero();
-
-      // Reveals de scroll — pendiente de activar cuando existan
-      // elementos con data-animate="fade-up" (ver tabla de
-      // microinteracciones de la propuesta).
-      // import { inicializarRevealsDeScroll } from '@/lib/gsap/animations';
-      // inicializarRevealsDeScroll();
+      inicializarRevealsDeScroll();
     </script>
   </body>
 </html>
