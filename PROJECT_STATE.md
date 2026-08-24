@@ -58,6 +58,18 @@ La razón de fondo para descartar 1 y 2: el proyecto ya tiene una decisión arqu
 
 **Límite de verificación encontrado en esta sesión:** se confirmó el valor final correcto, el fallback SSR completo y cero errores de consola, pero no se pudo capturar un fotograma intermedio de la animación (p. ej. "7+" a mitad de camino) porque la latencia entre llamadas a herramientas de este entorno (varios segundos) supera la duración de la animación (1.75s) — para cuando el script de muestreo llega al navegador, la cuenta ya terminó. La corrección del mecanismo se sostiene en la revisión de código (patrón estándar de GSAP, ya usado con éxito en `inicializarRevealsDeScroll`), no en una captura en vivo del conteo progresivo. Recomendable confirmarlo a simple vista en un dispositivo real si surge alguna duda.
 
+## Menú móvil a pantalla completa (`MenuMovil.astro`)
+
+Extraído de `Header.astro` a `src/components/interactive/MenuMovil.astro` — al necesitar bloqueo de scroll y cierre automático, cruza el umbral `static/` vs `interactive/` del proyecto (¿tiene `<script>` propio?). Sigue usando `<details>/<summary>` nativo como mecanismo de apertura (no estado en JS): da gratis que un clic en zona vacía interna nunca lo cierre — solo el botón, un enlace, o Escape (añadido en JS).
+
+**Dos bugs reales encontrados y corregidos, ninguno visible en la primera verificación de la sesión anterior porque se probó en un viewport de escritorio ancho (sin poder emular uno móvil angosto en este entorno):**
+
+1. **Botón X invisible sobre el panel.** El panel fullscreen (`fixed`, `z-40`) es descendiente del `<summary>` dentro del mismo `<header>` (que tiene `z-50`) — pero al estar AMBOS dentro del contexto de apilamiento local que crea el propio `<header>` (por `position:sticky` + `z-index`), el panel, con z-index explícito y posterior en el DOM, tapaba al summary pese al z-50 "exterior" del header. Corregido con `relative z-50` directamente en el `<summary>`, ganándole al panel dentro de ese mismo contexto local.
+2. **El salto siempre "reiniciaba" desde una posición vieja (el inicio, o la última sección visitada con scroll orgánico) en vez de partir de la posición real actual.** Causa: con `ScrollSmoother` activo, la función de bloqueo de scroll manipulaba `window.scrollTo()`/`body.style.position` directamente — ScrollSmoother mantiene su propia posición de scroll "suavizada" rastreada internamente, separada de `window.scrollY`, y una manipulación externa la desincroniza; la siguiente animación de `smoother.scrollTo()` arrancaba desde su último valor interno conocido, no desde la posición real. Se intentó corregir delegando el bloqueo en `smoother.paused()` (el mecanismo propio de ScrollSmoother, pensado explícitamente para esto según su código fuente) — pero se verificó en el navegador que `paused(true)` reinicia `window.scrollY` a 0 como efecto secundario no documentado en este montaje, así que se descartó. La solución final es la más simple: el patrón manual de bloqueo (guardar/restaurar `window.scrollY` con `body.style.position:fixed`) resultó correcto en realidad — el problema real de la sesión anterior era el cierre diferido con `setTimeout` (ver el punto siguiente), no ScrollSmoother. Verificado explícitamente con navegación secuencial real (Contacto → Sobre Nosotros → Servicios) vía el menú móvil, con pausas de ritmo humano entre pasos, no solo con un único salto desde el estado inicial de la página.
+3. **(De la entrega anterior, para contexto)** el cierre del `<details>` al pulsar un enlace debe ser síncrono, no diferido: el evento `toggle` nativo se despacha como tarea diferida incluso al cambiar `.open` por script, así que si el desbloqueo de scroll depende solo de ese evento, `scrollSmoother.ts` ya intenta animar con el scroll todavía bloqueado. `restaurarScroll()` se llama de forma síncrona en el propio clic del enlace (protegida por un guard `bloqueado` para que la llamada diferida posterior, vía "toggle", sea un no-op seguro).
+
+**Verificación en este entorno:** sin poder emular un viewport móvil real (herramienta de redimensionado sin efecto, igual que en sesiones anteriores), toda la verificación de comportamiento se hizo forzando `#menu-movil { display: block !important; }` vía CSS inyectada en tiempo de prueba — visible desde antes de cualquier interacción, para no introducir un salto de layout artificial que no ocurriría en un viewport angosto real (una primera pasada de pruebas SÍ tenía ese artefacto y produjo lecturas confusas). Recomendable una revisión visual manual en un dispositivo real antes de dar el menú por definitivamente cerrado.
+
 ## Roadmap de fases
 
 - [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. _(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)_
@@ -76,6 +88,11 @@ Para no bloquear el avance estructural mientras el cliente recopila su material 
 **Antes de desplegar a producción o compartir una vista previa con el cliente**, todo esto debe reemplazarse por datos reales (Fase 0). Buscar `Duarte & Iglesias`, `duarteiglesiasabogados.es` y `+34612345678` en el repo para localizar cada punto de reemplazo.
 
 ## Estado actual
+
+**Completado (24 de agosto de 2026, sesión de menú móvil a pantalla completa):**
+
+- Menú móvil extraído a `src/components/interactive/MenuMovil.astro` — panel `fixed`/`h-dvh` a pantalla completa, bloqueo de scroll del body mientras está abierto, cierre automático al pulsar un enlace (integrado con `smoother.scrollTo()` de `scrollSmoother.ts`), cierre con Escape, `aria-label` dinámico. Ver "Menú móvil a pantalla completa" arriba para el detalle completo, incluidos dos bugs reales encontrados y corregidos (botón X tapado por el propio panel; el salto de sección partía siempre de una posición vieja en vez de la actual).
+- Verificado: `npm run format`, `npx astro check` (0 errores), `npx astro build` (limpio), y una batería de pruebas de comportamiento en navegador (apertura/cierre, bloqueo de scroll, clic en zona vacía no cierra, cierre por enlace/botón/Escape, navegación secuencial entre tres secciones con pausas de ritmo humano, ambos temas claro/oscuro).
 
 **Completado (24 de agosto de 2026, sesión de cifras clave — arranque de Fase 4):**
 
@@ -129,5 +146,6 @@ Para no bloquear el avance estructural mientras el cliente recopila su material 
 4. Imagen OpenGraph dedicada (1200×630) — `BaseLayout.astro` ya emite las meta tags pero sin `og:image` todavía.
 5. Fase 4 — resto del catálogo de microinteracciones: reveals de scroll (`data-animate="fade-up"`, activarlos en los componentes que corresponda), stagger del Hero, hover de tarjetas de servicio, transición de header al hacer scroll.
 6. Confirmar a simple vista (dispositivo real o grabación) que el conteo progresivo de cifras clave se ve fluido — no se pudo verificar en vivo en este entorno de sesión (ver nota en "Sección de cifras clave").
+7. Revisión visual manual del menú móvil en un dispositivo real o DevTools — toda su verificación en esta sesión se hizo forzando su visibilidad vía CSS inyectada en un viewport de escritorio, no en un viewport móvil genuino (misma limitación de entorno que el Header en su momento).
 
 **No iniciado deliberadamente en esta sesión:** el resto del catálogo de microinteracciones de Fase 4 — solo se pidió el contador de cifras clave.

@@ -1,5 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
+import MenuMovil from '@/components/interactive/MenuMovil.astro';
 import ThemeToggle from '@/components/interactive/ThemeToggle.astro';
 import { negocio } from '@/lib/negocio';
 import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
@@ -49,40 +50,7 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
         Contactar por WhatsApp
       </a>
 
-      <details class="group relative md:hidden">
-        <summary
-          class="text-foreground hover:bg-muted focus-visible:outline-ring flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden"
-          aria-label="Abrir menú de navegación"
-        >
-          <Icon name="lucide:menu" class="h-5 w-5 group-open:hidden" aria-hidden="true" />
-          <Icon name="lucide:x" class="hidden h-5 w-5 group-open:block" aria-hidden="true" />
-        </summary>
-
-        <nav
-          class="border-border bg-card absolute top-full right-0 mt-2 w-56 rounded-lg border p-2 shadow-lg"
-          aria-label="Navegación principal (móvil)"
-        >
-          {
-            enlaces.map((enlace) => (
-              <a
-                href={enlace.href}
-                class="text-foreground hover:bg-muted block rounded-md px-3 py-2 text-sm font-medium"
-              >
-                {enlace.texto}
-              </a>
-            ))
-          }
-          <a
-            href={enlaceWhatsApp}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 mt-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold"
-          >
-            <Icon name="lucide:message-circle" class="h-4 w-4" aria-hidden="true" />
-            Contactar por WhatsApp
-          </a>
-        </nav>
-      </details>
+      <MenuMovil enlaces={enlaces} />
     </div>
   </div>
 </header>

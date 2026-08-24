@@ -1,0 +1,176 @@
+---
+/**
+ * Menú móvil a pantalla completa. Usa <details>/<summary> nativo como
+ * mecanismo de apertura/cierre (en vez de estado en JS) para heredar
+ * gratis su comportamiento: no se cierra al hacer clic en zonas vacías
+ * internas (los navegadores solo lo cierran al activar el <summary> o
+ * vía JS/teclado — nunca por un clic "fuera"), y expone su estado de
+ * forma razonable a lectores de pantalla. El <script> de abajo solo
+ * añade lo que <details> no da de fábrica: bloqueo de scroll del body,
+ * cierre automático al pulsar un enlace y cierre con Escape.
+ *
+ * El panel usa `h-dvh` en vez de `inset-0`/`bottom-0` a propósito: el
+ * <header> padre tiene `backdrop-blur-sm` (backdrop-filter), y
+ * cualquier ancestro con filter/backdrop-filter crea un nuevo contexto
+ * de contención para descendientes `position:fixed` — un `inset-0`
+ * ahí se calcula contra la caja (pequeña) del header, no contra el
+ * viewport real, y el panel queda con solo unos 100px de alto en vez
+ * de pantalla completa. `top-0` + `h-dvh` evita el problema porque las
+ * unidades de viewport (dvh) siempre se resuelven contra el viewport
+ * real, sin importar el contexto de contención — y como el header es
+ * sticky en top:0, su borde superior siempre coincide con el del
+ * viewport, así que top:0 relativo al header sigue siendo correcto.
+ */
+import { Icon } from 'astro-icon/components';
+import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
+
+// Nota de implementación (bloqueo de scroll): se probó delegar el
+// bloqueo en `ScrollSmoother.get()?.paused()` cuando hay un
+// ScrollSmoother activo, asumiendo que evitaría desincronizar su
+// posición interna frente a manipular `window.scrollTo()` a mano. Se
+// verificó en el navegador que `paused(true)` reinicia `window.scrollY`
+// a 0 en este montaje concreto (efecto secundario no documentado, no
+// deseado) — se descartó ese camino en favor del patrón manual de
+// abajo, verificado explícitamente con navegación secuencial entre
+// varias secciones (Contacto → Sobre Nosotros) antes de darlo por
+// bueno. Ver PROJECT_STATE.md para más detalle si esto se retoma.
+
+interface Enlace {
+  href: string;
+  texto: string;
+}
+
+interface Props {
+  enlaces: Enlace[];
+}
+
+const { enlaces } = Astro.props;
+const enlaceWhatsApp = construirEnlaceWhatsApp(
+  'Hola, quisiera más información sobre sus servicios.',
+);
+---
+
+<details id="menu-movil" class="group md:hidden">
+  <summary
+    id="menu-movil-boton"
+    class="text-foreground hover:bg-muted focus-visible:outline-ring relative z-50 flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden"
+    aria-label="Abrir menú de navegación"
+  >
+    <Icon name="lucide:menu" class="h-5 w-5 group-open:hidden" aria-hidden="true" />
+    <Icon name="lucide:x" class="hidden h-5 w-5 group-open:block" aria-hidden="true" />
+  </summary>
+
+  <nav
+    class="bg-background fixed inset-x-0 top-0 z-40 flex h-dvh flex-col px-6 pt-24 pb-8"
+    aria-label="Navegación principal (móvil)"
+  >
+    <ul class="flex flex-col gap-1">
+      {
+        enlaces.map((enlace) => (
+          <li>
+            <a
+              href={enlace.href}
+              data-menu-movil-enlace
+              class="text-foreground hover:bg-muted hover:text-accent block rounded-lg px-4 py-4 font-serif text-2xl font-medium transition-colors"
+            >
+              {enlace.texto}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a
+      href={enlaceWhatsApp}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-menu-movil-enlace
+      class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 mt-auto flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold transition-colors"
+    >
+      <Icon name="lucide:message-circle" class="h-5 w-5" aria-hidden="true" />
+      Contactar por WhatsApp
+    </a>
+  </nav>
+</details>
+
+<script>
+  const detalles = document.getElementById('menu-movil');
+  const boton = document.getElementById('menu-movil-boton');
+
+  if (detalles instanceof HTMLDetailsElement && boton) {
+    let scrollGuardado = 0;
+    let bloqueado = false;
+
+    // Patrón robusto de bloqueo de scroll (a prueba de iOS Safari, que
+    // ignora overflow:hidden en el body mientras el usuario arrastra):
+    // fija el body en su posición actual con position:fixed y lo
+    // restaura al cerrar, sin perder el punto de scroll original.
+    // Ambas funciones son idempotentes (protegidas por `bloqueado`)
+    // porque restaurarScroll() se llama desde dos sitios distintos —
+    // ver más abajo por qué.
+    function bloquearScroll(): void {
+      if (bloqueado) return;
+      bloqueado = true;
+      scrollGuardado = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollGuardado}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+    }
+
+    function restaurarScroll(): void {
+      if (!bloqueado) return;
+      bloqueado = false;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, scrollGuardado);
+    }
+
+    // Reacciona al estado real de <details> para abrir/cerrar el
+    // bloqueo en el caso general (botón, Escape). OJO: el evento
+    // "toggle" se despacha como una tarea diferida según el estándar
+    // HTML — incluso al cambiar `.open` por script, no llega en el
+    // mismo tick. Eso es intrascendente para abrir (nada compite por
+    // el scroll en ese instante), pero SÍ importa al cerrar por un
+    // enlace — ver el listener de abajo.
+    detalles.addEventListener('toggle', () => {
+      if (detalles.open) {
+        bloquearScroll();
+        boton.setAttribute('aria-label', 'Cerrar menú de navegación');
+      } else {
+        restaurarScroll();
+        boton.setAttribute('aria-label', 'Abrir menú de navegación');
+      }
+    });
+
+    // Cierre automático al navegar. El salto/scroll hacia la sección lo
+    // dispara, por separado, el listener de clics de scrollSmoother.ts
+    // (delegado en document) — ese listener corre DESPUÉS de este en la
+    // fase de burbuja del mismo clic, así que aquí ya podemos desbloquear
+    // el scroll de forma síncrona antes de que le toque el turno.
+    //
+    // Es necesario llamar a restaurarScroll() aquí mismo, no solo
+    // dejarlo a cargo del evento "toggle": al ser una tarea diferida,
+    // para cuando ese evento llega scrollSmoother ya intentó animar el
+    // scroll con el body todavía en position:fixed (bloqueado) — la URL
+    // cambiaba de hash pero la página nunca se movía visualmente. La
+    // llamada de aquí es síncrona y gana esa carrera; la que llegue
+    // después vía "toggle" queda protegida por el guard de `bloqueado`
+    // y no hace nada (evita un doble scrollTo que pelee con la
+    // animación de scrollSmoother ya en marcha).
+    detalles.querySelectorAll('[data-menu-movil-enlace]').forEach((enlace) => {
+      enlace.addEventListener('click', () => {
+        detalles.open = false;
+        restaurarScroll();
+      });
+    });
+
+    document.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape' && detalles.open) {
+        detalles.open = false;
+      }
+    });
+  }
+</script>
