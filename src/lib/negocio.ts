@@ -28,21 +28,24 @@ export interface DatosNegocio {
 	rangoHonorarios: string; // ej. "$$" — usado en priceRange de LegalService
 }
 
+// CONTENIDO FICTICIO PARA DESARROLLO (Fase 2) — despacho, dirección y
+// contactos son inventados pero verosímiles para el sector legal español.
 // TODO(fase 0): reemplazar con los datos reales provistos por los socios.
 export const negocio: DatosNegocio = {
-	nombreDespacho: 'Nombre del Despacho',
-	descripcionCorta: 'Descripción breve pendiente de definir con el cliente.',
-	telefonoWhatsapp: '+00000000000',
-	email: 'contacto@example.com',
+	nombreDespacho: 'Duarte & Iglesias Abogados',
+	descripcionCorta:
+		'Despacho de abogados en Madrid especializado en derecho civil, de familia, laboral y mercantil, con más de 20 años de experiencia combinada al servicio de particulares y empresas.',
+	telefonoWhatsapp: '+34612345678',
+	email: 'info@duarteiglesiasabogados.es',
 	direccion: {
-		calle: 'Pendiente',
-		ciudad: 'Pendiente',
-		region: 'Pendiente',
-		codigoPostal: '00000',
-		pais: 'MX',
+		calle: 'Calle de Alcalá, 123, 3º Izquierda',
+		ciudad: 'Madrid',
+		region: 'Comunidad de Madrid',
+		codigoPostal: '28009',
+		pais: 'ES',
 	},
-	areaCobertura: [],
-	horario: [{ dias: 'Lunes a Viernes', horas: '9:00 - 18:00' }],
+	areaCobertura: ['Madrid capital', 'Comunidad de Madrid'],
+	horario: [{ dias: 'Lunes a Viernes', horas: '9:00 - 19:00' }],
 	redesSociales: [],
-	rangoHonorarios: '$$',
+	rangoHonorarios: '€€',
 };

@@ -1,10 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-// TODO(fase 2): componer Header, Hero, SobreNosotros, Servicios,
-// Conversión y Footer a partir de src/components/static/.
+import Header from '../components/static/Header.astro';
+import Hero from '../components/static/Hero.astro';
+import SobreNosotros from '../components/static/SobreNosotros.astro';
+import Servicios from '../components/static/Servicios.astro';
+import Footer from '../components/static/Footer.astro';
+import { negocio } from '../lib/negocio';
 ---
 
-<BaseLayout title="Nombre del Despacho" description="Descripción pendiente de definir con el cliente (Fase 0).">
-	<p>Estructura base — maquetación pendiente (Fase 2).</p>
+<BaseLayout title={`${negocio.nombreDespacho} — Abogados en ${negocio.direccion.ciudad}`} description={negocio.descripcionCorta}>
+	<Header />
+	<main>
+		<Hero />
+		<SobreNosotros />
+		<Servicios />
+	</main>
+	<Footer />
 </BaseLayout>

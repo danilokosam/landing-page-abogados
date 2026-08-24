@@ -22,14 +22,20 @@ Contexto completo y justificación de cada decisión: ver la Propuesta de Arquit
 
 ## Roadmap de fases
 
-- [x] **Fase 0 — Descubrimiento y contenido.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales. *(Bloqueado en insumo del cliente — ver "Estado actual".)*
+- [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. *(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)*
 - [x] **Fase 1 — Setup y arquitectura base.** Astro + TypeScript estricto, Tailwind, Content Collections, árbol de carpetas, `PROJECT_STATE.md`.
-- [ ] **Fase 2 — Estructura estática.** Componentes `.astro` de `components/static/` con contenido real ya cargado en las colecciones; sitio completamente navegable sin una línea de GSAP.
-- [ ] **Fase 3 — Sistema visual y diseño.** Tipografía, paleta, ritmo vertical, estados de componentes; revisión de contraste WCAG.
+- [x] **Fase 2 — Estructura estática.** Componentes `.astro` de `components/static/` ensamblados en `index.astro`, sitio completamente navegable y responsive, sin una línea de GSAP. Construida sobre contenido ficticio (ver abajo), no sobre el insumo real de Fase 0.
+- [ ] **Fase 3 — Sistema visual y diseño.** Tipografía propia (par de fuentes), paleta de marca vía `@theme` de Tailwind, ritmo vertical, estados de componentes; revisión de contraste WCAG. La Fase 2 usó la paleta y tipografía por defecto de Tailwind (`slate`/`amber`/`emerald`, fuentes del sistema) deliberadamente, para no anticipar decisiones de marca que le corresponden a esta fase.
 - [ ] **Fase 4 — Animación e interacción.** Implementación de GSAP/ScrollTrigger según la tabla de microinteracciones de la propuesta.
-- [ ] **Fase 5 — SEO, Schema y accesibilidad.** JSON-LD `LegalService`, OpenGraph, auditoría de teclado/contraste/alt.
+- [ ] **Fase 5 — SEO, Schema y accesibilidad.** JSON-LD `LegalService` (generador ya existe en `schema.ts`, falta invocarlo desde una página), OpenGraph (imagen dedicada), auditoría de teclado/contraste/alt.
 - [ ] **Fase 6 — Testing y QA.** Lighthouse, prueba de enlaces WhatsApp, `prefers-reduced-motion`, cross-browser (prioridad Safari iOS).
 - [ ] **Fase 7 — Despliegue.** Hosting, dominio, analítica, Search Console.
+
+## ⚠️ Contenido ficticio — no confundir con datos reales del cliente
+
+Para no bloquear el avance estructural mientras el cliente recopila su material (Fase 0), esta sesión pobló `negocio.ts` y las colecciones de contenido con un despacho, socios y honorarios **inventados pero verosímiles**: "Duarte & Iglesias Abogados", Elena Duarte Ríos y Javier Iglesias Montes, dirección en Calle de Alcalá (Madrid), teléfono `+34612345678`, email `info@duarteiglesiasabogados.es`. Las fotos de los socios son avatares SVG con monograma (iniciales sobre un círculo), no fotografías — se evitó deliberadamente usar imágenes de stock de personas reales (p. ej. Unsplash) como retrato de un abogado ficticio.
+
+**Antes de desplegar a producción o compartir una vista previa con el cliente**, todo esto debe reemplazarse por datos reales (Fase 0). Buscar `Duarte & Iglesias`, `duarteiglesiasabogados.es` y `+34612345678` en el repo para localizar cada punto de reemplazo.
 
 ## Estado actual
 
@@ -40,18 +46,20 @@ Contexto completo y justificación de cada decisión: ver la Propuesta de Arquit
 - `astro.config.mjs` con integraciones `tailwindcss()` e `icon()` registradas.
 - Árbol de carpetas creado según la arquitectura acordada (`src/content/`, `src/components/{static,interactive,ui}/`, `src/layouts/`, `src/lib/{gsap,}`, `src/styles/`, `src/pages/`).
 - `src/content.config.ts` — esquemas Zod para `servicios` y `socios`, usando la Content Layer API (`glob` loader) de Astro 7; formato `defineCollection` legacy descartado por incompatible con esta versión.
-- Plantillas de referencia `_ejemplo.md` en `content/servicios/` y `content/socios/` (ignoradas por el loader — prefijo `_`).
-- `src/lib/negocio.ts`, `src/lib/whatsapp.ts`, `src/lib/schema.ts`, `src/lib/gsap/setup.ts`, `src/lib/gsap/animations.ts` — esqueletos tipados, con datos de negocio en placeholder (`TODO(fase 0)`).
-- `src/layouts/BaseLayout.astro` — documento base con metadata/OpenGraph mínimo, sin secciones de UI.
-- `src/pages/index.astro` — usa `BaseLayout`, sin maquetación de secciones todavía.
-- Verificado: `npx astro check` (0 errores) y `npx astro build` (build de producción exitoso).
-- Git **no inicializado todavía** — pendiente de decisión del usuario.
+- **Git inicializado**, commit inicial subido a `origin/master` (`git@github.com:danilokosam/landing-page-abogados.git`).
+- **`negocio.ts` poblado** con datos ficticios de desarrollo (ver aviso arriba).
+- **6 servicios** creados en `src/content/servicios/` (Civil, Laboral, Familia, Mercantil, Penal, Inmobiliario), cada uno con ícono Lucide, rango de honorarios y mensaje de WhatsApp específico.
+- **2 socios** creados en `src/content/socios/` (Elena Duarte Ríos, Javier Iglesias Montes) con formación, especialidades, acreditaciones, bio en el cuerpo del Markdown y avatar SVG monograma colocado junto a cada entrada.
+- **Componentes estáticos construidos** en `src/components/static/`: `Header` (nav sticky semitransparente + menú móvil vía `<details>/<summary>`, cero JS), `Hero`, `SobreNosotros` (lee la colección `socios`, renderiza bio vía `render()`), `Servicios` + `TarjetaServicio` (lee la colección `servicios`, botón WhatsApp por tarjeta vía `construirEnlaceWhatsApp`), `Footer` (datos de contacto + aviso legal/privacidad ficticio, `id="contacto"`).
+- `src/pages/index.astro` ensambla Header → Hero → SobreNosotros → Servicios → Footer dentro de `BaseLayout`.
+- `src/styles/global.css` — se agregó `scroll-behavior: smooth` con guarda `prefers-reduced-motion` para los anclajes de navegación (CSS puro, no GSAP).
+- Verificado: `npx astro check` (0 errores), `npx astro build` (build de producción limpio, sin warnings), y revisión visual en navegador (desktop y viewport móvil 390×844) — nav, menú móvil, tarjetas de servicio y footer renderizan correctamente; los 10 enlaces `wa.me` del sitio generan el mensaje precargado esperado.
 
-**Pendiente para la próxima sesión (arranca en Fase 0 / Fase 2):**
+**Pendiente para la próxima sesión:**
 
-1. Insumo real del cliente: bios de los dos socios, fotos, áreas de práctica definitivas, honorarios o política de primera consulta, número de WhatsApp de negocio, dirección/horario.
-2. Completar `src/lib/negocio.ts` con esos datos reales (reemplaza los placeholders `TODO(fase 0)`).
-3. Crear las entradas reales en `src/content/servicios/*.md` y `src/content/socios/*.md` (copiando `_ejemplo.md` sin el guion bajo).
-4. Recién entonces: Fase 2 — construir los componentes de `components/static/` (Header, Hero, SobreNosotros, TarjetaServicio, Footer, SEO) y componer `index.astro`.
+1. Insumo real del cliente (Fase 0, sigue abierta): bios, fotos reales, honorarios definitivos, número de WhatsApp real, dirección/horario — y reemplazo de todo el contenido ficticio listado arriba.
+2. Fase 3 — sistema visual: definir tipografía de marca y tokens de color propios (hoy la Fase 2 usa la paleta/tipografía por defecto de Tailwind a propósito, para no adelantar esta decisión).
+3. Invocar `generarLegalServiceSchema()` (ya existe en `schema.ts`) desde `BaseLayout.astro` o `index.astro` e inyectarlo como `<script type="application/ld+json">` — quedó implementado pero no conectado.
+4. Imagen OpenGraph dedicada (1200×630) — `BaseLayout.astro` ya emite las meta tags pero sin `og:image` todavía.
 
-**No iniciado deliberadamente en esta sesión:** maquetación, componentes de UI, animaciones GSAP reales, contenido de marketing — por instrucción explícita de mantener esta sesión limitada a setup.
+**No iniciado deliberadamente en esta sesión:** animaciones GSAP reales (Fase 4), tokens de marca/paleta definitiva (Fase 3) — por instrucción explícita de mantener esta sesión limitada a estructura estática.

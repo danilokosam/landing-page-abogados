@@ -1,0 +1,88 @@
+---
+import { Icon } from 'astro-icon/components';
+import { negocio } from '../../lib/negocio';
+import { construirEnlaceWhatsApp } from '../../lib/whatsapp';
+
+const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consulta.');
+const anioActual = new Date().getFullYear();
+
+const enlaces = [
+	{ href: '#sobre-nosotros', texto: 'Sobre Nosotros' },
+	{ href: '#servicios', texto: 'Servicios' },
+];
+---
+
+<footer id="contacto" class="scroll-mt-20 bg-slate-900 text-slate-300">
+	<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+		<div class="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
+			<div>
+				<p class="font-serif text-lg font-semibold text-white">{negocio.nombreDespacho}</p>
+				<p class="mt-3 max-w-sm text-sm leading-relaxed text-slate-400">
+					{negocio.descripcionCorta}
+				</p>
+				<a
+					href={enlaceWhatsApp}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+				>
+					<Icon name="lucide:message-circle" class="h-4 w-4" aria-hidden="true" />
+					Escribir por WhatsApp
+				</a>
+			</div>
+
+			<div>
+				<h3 class="text-sm font-semibold uppercase tracking-wide text-slate-100">Contacto</h3>
+				<ul class="mt-4 space-y-3 text-sm text-slate-400">
+					<li class="flex items-start gap-2">
+						<Icon name="lucide:map-pin" class="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+						<span>
+							{negocio.direccion.calle}<br />
+							{negocio.direccion.ciudad}, {negocio.direccion.region} {negocio.direccion.codigoPostal}
+						</span>
+					</li>
+					<li class="flex items-center gap-2">
+						<Icon name="lucide:phone" class="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+						<a href={`tel:${negocio.telefonoWhatsapp}`} class="hover:text-white">{negocio.telefonoWhatsapp}</a>
+					</li>
+					<li class="flex items-center gap-2">
+						<Icon name="lucide:mail" class="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+						<a href={`mailto:${negocio.email}`} class="hover:text-white">{negocio.email}</a>
+					</li>
+					<li class="flex items-center gap-2">
+						<Icon name="lucide:clock" class="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+						{negocio.horario.map((h) => `${h.dias}: ${h.horas}`).join(' · ')}
+					</li>
+				</ul>
+			</div>
+
+			<div>
+				<h3 class="text-sm font-semibold uppercase tracking-wide text-slate-100">Accesos</h3>
+				<ul class="mt-4 space-y-3 text-sm text-slate-400">
+					{
+						enlaces.map((enlace) => (
+							<li>
+								<a href={enlace.href} class="hover:text-white">
+									{enlace.texto}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+
+		<div class="mt-14 border-t border-slate-800 pt-8 text-xs leading-relaxed text-slate-500">
+			<p>
+				Aviso legal y política de privacidad: {negocio.nombreDespacho} trata los datos facilitados a
+				través de este sitio con la única finalidad de responder a su consulta, conforme al
+				Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018. No se cederán a terceros salvo
+				obligación legal. Puede ejercer sus derechos de acceso, rectificación y supresión
+				escribiendo a {negocio.email}.
+			</p>
+			<p class="mt-3">
+				© {anioActual} {negocio.nombreDespacho}. Todos los derechos reservados.
+			</p>
+		</div>
+	</div>
+</footer>
