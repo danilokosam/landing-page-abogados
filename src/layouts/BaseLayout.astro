@@ -58,11 +58,31 @@ const { title, description } = Astro.props;
     <meta property="og:description" content={description} />
   </head>
   <body>
-    <slot />
+    <!--
+      El Header (slot "fixed") vive fuera de #smooth-content a propósito:
+      ScrollSmoother transforma #smooth-content para simular el scroll, y
+      cualquier position: sticky/fixed DENTRO de un ancestro transformado
+      deja de funcionar. Aquí, al ser hermano del wrapper y no
+      descendiente, el Header sigue siendo sticky de forma nativa sin
+      tratamiento adicional.
+    -->
+    <slot name="fixed" />
+
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <slot />
+      </div>
+    </div>
 
     <script>
       // Punto único de inicialización de animaciones (Fase 4).
+      // ScrollSmoother se inicializa primero: ScrollTrigger necesita
+      // que el "scroller" ya esté configurado antes de crear los
+      // triggers de las animaciones siguientes, para que disparen en
+      // la posición de scroll correcta desde el primer fotograma.
+      import { inicializarScrollSmoother } from '@/lib/gsap/scrollSmoother';
       import { inicializarContadores, inicializarEntradaHero } from '@/lib/gsap/animations';
+      inicializarScrollSmoother();
       inicializarContadores();
       inicializarEntradaHero();
 

@@ -172,10 +172,15 @@ body {
  * sobrio"; esta opción da la firma visual pedida sin animación ni coste
  * de rendimiento). Se referencia a las variables de color, así que se
  * adapta solo entre tema claro y oscuro.
+ *
+ * No se declara `position: relative` aquí a propósito: el Header ya es
+ * `sticky` (Tailwind, en Header.astro) y `position: sticky` establece el
+ * mismo contexto de posicionamiento para el ::after que `relative`
+ * habría dado — declararlo aparte tenía la misma especificidad que la
+ * utilidad `.sticky` de Tailwind y, según el orden de la cascada, podía
+ * pisarla y dejar el Header sin efecto sticky real (bug detectado y
+ * corregido al integrar ScrollSmoother, ver PROJECT_STATE.md).
  */
-.site-header {
-  position: relative;
-}
 .site-header::after {
   content: '';
   position: absolute;
