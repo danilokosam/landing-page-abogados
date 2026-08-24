@@ -46,13 +46,25 @@ Implementado en `src/styles/global.css` mediante variables CSS + `@theme inline`
 
 La razón de fondo para descartar 1 y 2: el proyecto ya tiene una decisión arquitectónica explícita de que todo lo animado/scroll-driven se implementa en Fase 4 con GSAP, como capa de acabado final sobre una base ya cerrada — traer un efecto scroll-driven a Fase 3 (aunque fuera CSS-only) habría contradicho esa disciplina de fases sin necesidad, ya que la opción estática cumple el pedido ("toque distintivo") igual de bien y con más sobriedad.
 
+## Sección de cifras clave (`CifrasClave.astro`)
+
+**Cambio estructural:** las 4 cifras vivían como un `<dl>` de 2 columnas dentro del propio `<section>` del Hero (compartiendo un grid `lg:grid-cols-[1.1fr_0.9fr]` con el titular). Se extrajeron a su propia sección — `src/components/static/CifrasClave.astro`, `id="cifras-clave"` — con un grid dedicado de 1/2/4 columnas. Esto obligó a simplificar `Hero.astro` de vuelta a una sola columna (`max-w-3xl`, sin grid) y a mover el fondo `bg-muted border-b` del Hero a la nueva sección. El ritmo de bandas alternas del sitio pasa de 4 a 5: Header → Hero (`bg-background`) → CifrasClave (`bg-muted`) → SobreNosotros (`bg-background`) → Servicios (`bg-muted`) → Footer (banda fija).
+
+**Datos:** array `CifraClave[]` tipado (`valor: number`, `sufijo: string`, `etiqueta: string`) definido localmente en el frontmatter del componente — no se creó una Content Collection ni un archivo en `lib/` porque estos 4 valores no son contenido editorial (no los toca nadie fuera de una revisión de código) y no se reutilizan en ningún otro componente; un array tipado en el propio archivo es el nivel de indirección correcto para este caso, no menos.
+
+**Por qué `CifrasClave.astro` vive en `components/static/` y no en `interactive/`:** el componente en sí no contiene ningún `<script>` — es marcado 100% estático con atributos `data-counter`/`data-suffix`. La animación la inicializa `inicializarContadores()` centralizadamente desde `BaseLayout.astro`, el mismo patrón ya previsto para `data-animate="fade-up"`. El criterio de esta carpeta (`static/` vs `interactive/`) es "¿el archivo tiene su propio script?", no "¿termina animado en pantalla?" — por eso vive junto a `Hero`/`Servicios`, no junto a `ThemeToggle`.
+
+**Animación (`inicializarContadores()` en `src/lib/gsap/animations.ts`):** `gsap.to()` sobre un objeto proxy `{ valor: 0 }` interpolado hasta el valor final, `power2.out`, 1.75s, `ScrollTrigger` con `once: true` y `start: 'top 85%'` (mismo umbral que `inicializarRevealsDeScroll`, por consistencia). El sufijo (`+`, `h`) se reaplica en cada `onUpdate` para no perderlo. Envuelta en `respetaMovimiento.add('(prefers-reduced-motion: no-preference)', …)` — si el usuario pide movimiento reducido, el bloque nunca se registra y el texto se queda tal cual lo renderizó el servidor (el valor final completo), que es exactamente el fallback de accesibilidad/SEO pedido.
+
+**Límite de verificación encontrado en esta sesión:** se confirmó el valor final correcto, el fallback SSR completo y cero errores de consola, pero no se pudo capturar un fotograma intermedio de la animación (p. ej. "7+" a mitad de camino) porque la latencia entre llamadas a herramientas de este entorno (varios segundos) supera la duración de la animación (1.75s) — para cuando el script de muestreo llega al navegador, la cuenta ya terminó. La corrección del mecanismo se sostiene en la revisión de código (patrón estándar de GSAP, ya usado con éxito en `inicializarRevealsDeScroll`), no en una captura en vivo del conteo progresivo. Recomendable confirmarlo a simple vista en un dispositivo real si surge alguna duda.
+
 ## Roadmap de fases
 
 - [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. _(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)_
 - [x] **Fase 1 — Setup y arquitectura base.** Astro + TypeScript estricto, Tailwind, Content Collections, árbol de carpetas, `PROJECT_STATE.md`.
 - [x] **Fase 2 — Estructura estática.** Componentes `.astro` de `components/static/` ensamblados en `index.astro`, sitio completamente navegable y responsive, sin una línea de GSAP. Construida sobre contenido ficticio (ver abajo), no sobre el insumo real de Fase 0.
 - [x] **Fase 3 — Sistema visual y diseño (completa).** Sistema de color con variables CSS + `@theme inline`, modo oscuro automático (`prefers-color-scheme`) y forzable (`.dark`), todos los componentes en tokens semánticos, tipografía de marca (Playfair Display + Plus Jakarta Sans, autoservida vía `@fontsource`), `ThemeToggle.astro` con persistencia en `localStorage` y script bloqueante anti-parpadeo, y borde inferior de acento en el Header. Ejecutada en dos entregas — ver "Sistema de diseño" abajo para el detalle completo de ambas.
-- [ ] **Fase 4 — Animación e interacción.** Implementación de GSAP/ScrollTrigger según la tabla de microinteracciones de la propuesta.
+- [ ] **Fase 4 — Animación e interacción (iniciada).** Primera microinteracción implementada: contador numérico progresivo en la sección de cifras clave (`inicializarContadores()`). Pendientes de la tabla original: reveals de scroll (`data-animate="fade-up"`, función ya escrita en `animations.ts` pero sin usar en ningún componente todavía), stagger del Hero, hover de tarjetas de servicio, transición de header al hacer scroll.
 - [ ] **Fase 5 — SEO, Schema y accesibilidad.** JSON-LD `LegalService` (generador ya existe en `schema.ts`, falta invocarlo desde una página), OpenGraph (imagen dedicada), auditoría de teclado/contraste/alt.
 - [ ] **Fase 6 — Testing y QA.** Lighthouse, prueba de enlaces WhatsApp, `prefers-reduced-motion`, cross-browser (prioridad Safari iOS).
 - [ ] **Fase 7 — Despliegue.** Hosting, dominio, analítica, Search Console.
@@ -64,6 +76,15 @@ Para no bloquear el avance estructural mientras el cliente recopila su material 
 **Antes de desplegar a producción o compartir una vista previa con el cliente**, todo esto debe reemplazarse por datos reales (Fase 0). Buscar `Duarte & Iglesias`, `duarteiglesiasabogados.es` y `+34612345678` en el repo para localizar cada punto de reemplazo.
 
 ## Estado actual
+
+**Completado (24 de agosto de 2026, sesión de cifras clave — arranque de Fase 4):**
+
+- Sección de cifras clave extraída de `Hero.astro` a su propio componente `src/components/static/CifrasClave.astro`, `id="cifras-clave"`, con las 4 métricas en un array `CifraClave[]` tipado. Copy del primer ítem actualizado a "Socios fundadores, dedicación directa en cada caso" (antes "disponibles en cada caso").
+- Grid responsivo 1 columna (móvil) / 2 (tablet, `sm:`) / 4 (desktop, `lg:`), con divisores verticales sutiles entre columnas solo en desktop (`lg:divide-x lg:divide-border`) — deliberadamente ausentes en móvil/tablet para evitar el efecto de borde mal alineado que produce `divide-x` cuando una grid envuelve a varias filas.
+- Tratamiento tipográfico: cifra en `font-serif` + `text-accent` (toque de bronce) a `text-4xl`/`lg:text-5xl`, etiqueta en `font-sans` (`text-muted-foreground`) — `tabular-nums` en el número para que los dígitos no salten de ancho durante el conteo.
+- `inicializarContadores()` nuevo en `src/lib/gsap/animations.ts` — contador progresivo con GSAP + ScrollTrigger (`once: true`, `power2.out`, 1.75s), activado desde el `<script>` de página de `BaseLayout.astro`. Detalle completo del mecanismo y de sus límites de verificación en "Sección de cifras clave" arriba.
+- `Hero.astro` simplificado de vuelta a una sola columna al perder el `<dl>` de cifras; el fondo `bg-muted` se trasladó a la nueva sección.
+- Verificado: `npm run format`, `npx astro check` (0 errores), `npx astro build` (limpio), fallback SSR confirmado en `dist/index.html` (`data-counter="2/20/6/24"` con el texto completo ya renderizado), revisión visual en navegador (grid, divisores, tipografía) y cero errores de consola al cargar la página.
 
 **Completado (24 de agosto de 2026, sesión de tipografía + theme toggle + header — cierre de Fase 3):**
 
@@ -106,6 +127,7 @@ Para no bloquear el avance estructural mientras el cliente recopila su material 
 2. Revisión visual manual del Header en móvil real/DevTools (ver nota de verificación arriba) — el redimensionado de ventana no funcionó en este entorno de sesión.
 3. Invocar `generarLegalServiceSchema()` (ya existe en `schema.ts`) desde `BaseLayout.astro` o `index.astro` e inyectarlo como `<script type="application/ld+json">` — quedó implementado pero no conectado.
 4. Imagen OpenGraph dedicada (1200×630) — `BaseLayout.astro` ya emite las meta tags pero sin `og:image` todavía.
-5. Fase 4 — animaciones GSAP/ScrollTrigger reales, según la tabla de microinteracciones de la propuesta. Fase 3 queda completamente cerrada: paleta, tokens, tipografía y theme toggle.
+5. Fase 4 — resto del catálogo de microinteracciones: reveals de scroll (`data-animate="fade-up"`, activarlos en los componentes que corresponda), stagger del Hero, hover de tarjetas de servicio, transición de header al hacer scroll.
+6. Confirmar a simple vista (dispositivo real o grabación) que el conteo progresivo de cifras clave se ve fluido — no se pudo verificar en vivo en este entorno de sesión (ver nota en "Sección de cifras clave").
 
-**No iniciado deliberadamente en esta sesión:** animaciones GSAP (Fase 4) — por instrucción explícita de mantener esta sesión limitada al Header, la tipografía y el selector de tema.
+**No iniciado deliberadamente en esta sesión:** el resto del catálogo de microinteracciones de Fase 4 — solo se pidió el contador de cifras clave.

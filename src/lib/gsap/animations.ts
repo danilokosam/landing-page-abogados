@@ -30,6 +30,39 @@ export function inicializarRevealsDeScroll(): void {
   });
 }
 
-// TODO(fase 4): stagger del hero, contador numérico de cifras de
-// trayectoria, hover de tarjetas de servicio — ver tabla de
-// microinteracciones de la propuesta.
+/**
+ * Cuenta progresiva de 0 al valor final para elementos [data-counter].
+ * El HTML ya renderiza el valor final (ver CifrasClave.astro) como
+ * fallback de accesibilidad/SEO; esta animación solo lo sobrescribe
+ * temporalmente si el usuario no pidió `prefers-reduced-motion`. Se
+ * dispara una única vez al entrar en el viewport (`once: true`).
+ */
+export function inicializarContadores(): void {
+  respetaMovimiento.add('(prefers-reduced-motion: no-preference)', () => {
+    const elementos = gsap.utils.toArray<HTMLElement>('[data-counter]');
+
+    elementos.forEach((el) => {
+      const valorFinal = Number(el.dataset.counter);
+      const sufijo = el.dataset.suffix ?? '';
+      if (Number.isNaN(valorFinal)) return;
+
+      const contador = { valor: 0 };
+      gsap.to(contador, {
+        valor: valorFinal,
+        duration: 1.75,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          once: true,
+        },
+        onUpdate: () => {
+          el.textContent = `${Math.round(contador.valor)}${sufijo}`;
+        },
+      });
+    });
+  });
+}
+
+// TODO(fase 4): stagger del hero, hover de tarjetas de servicio — ver
+// tabla de microinteracciones de la propuesta.

@@ -54,6 +54,12 @@ const { title, description } = Astro.props;
 
     <script>
       // Punto único de inicialización de animaciones (Fase 4).
+      import { inicializarContadores } from '@/lib/gsap/animations';
+      inicializarContadores();
+
+      // Reveals de scroll — pendiente de activar cuando existan
+      // elementos con data-animate="fade-up" (ver tabla de
+      // microinteracciones de la propuesta).
       // import { inicializarRevealsDeScroll } from '@/lib/gsap/animations';
       // inicializarRevealsDeScroll();
     </script>
