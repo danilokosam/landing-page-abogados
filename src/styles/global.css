@@ -203,3 +203,37 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/*
+ * Estado inicial de la entrada del Hero (Propuesta 02 — "revelado con
+ * línea de firma"), consumida por inicializarEntradaHero() en
+ * src/lib/gsap/animations.ts. Solo se oculta cuando SE CUMPLEN LAS DOS
+ * condiciones a la vez:
+ *   1. html:not(.no-js) — JS confirmó (BaseLayout.astro, script
+ *      bloqueante) que va a tomar control antes del primer pintado.
+ *      Sin JS, "no-js" nunca se quita y el contenido queda visible.
+ *   2. prefers-reduced-motion: no-preference — si el usuario pidió
+ *      menos movimiento, esta regla no aplica en absoluto: el Hero se
+ *      pinta ya en su estado final, sin ocultarse nunca (evita dejar
+ *      contenido invisible si la animación no llega a correr).
+ * GSAP solo anima HACIA el estado visible (gsap.to), nunca declara el
+ * "from" — así este bloque sigue siendo la única fuente de verdad del
+ * estado inicial, sin duplicar valores entre CSS y JS.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.no-js) [data-hero-anim='eyebrow'],
+  html:not(.no-js) [data-hero-anim='lead'] {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  html:not(.no-js) [data-hero-anim='cta'] {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  html:not(.no-js) [data-hero-anim='line'] {
+    transform: scaleX(0);
+  }
+  html:not(.no-js) [data-hero-anim='title'] {
+    clip-path: inset(0% 0% 100% 0%);
+  }
+}

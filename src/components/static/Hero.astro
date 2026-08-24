@@ -8,18 +8,26 @@ const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consu
 
 <section class="bg-background">
   <div class="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-    <p class="text-accent text-sm font-semibold tracking-widest uppercase">Abogados en Madrid</p>
+    <p data-hero-anim="eyebrow" class="text-accent text-sm font-semibold tracking-widest uppercase">
+      Abogados en Madrid
+    </p>
+    <span
+      data-hero-anim="line"
+      aria-hidden="true"
+      class="bg-accent mt-3 mb-5 block h-px w-16 origin-left"></span>
     <h1
-      class="text-foreground mt-4 font-serif text-4xl leading-tight font-semibold text-balance sm:text-5xl"
+      data-hero-anim="title"
+      class="text-foreground font-serif text-4xl leading-tight font-semibold text-balance sm:text-5xl"
     >
       Asesoramiento jurídico claro, en el momento en que lo necesita
     </h1>
-    <p class="text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed">
+    <p data-hero-anim="lead" class="text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed">
       {negocio.descripcionCorta}
     </p>
 
     <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
       <a
+        data-hero-anim="cta"
         href={enlaceWhatsApp}
         target="_blank"
         rel="noopener noreferrer"
@@ -29,6 +37,7 @@ const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consu
         Agendar una consulta por WhatsApp
       </a>
       <a
+        data-hero-anim="cta"
         href="#servicios"
         class="border-border text-foreground hover:border-primary hover:bg-card focus-visible:outline-ring inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3.5 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
       >

@@ -64,5 +64,35 @@ export function inicializarContadores(): void {
   });
 }
 
-// TODO(fase 4): stagger del hero, hover de tarjetas de servicio — ver
-// tabla de microinteracciones de la propuesta.
+/**
+ * Entrada del bloque principal del Hero — "revelado con línea de firma"
+ * (Propuesta 02 del estudio de animación). El estado inicial oculto de
+ * [data-hero-anim] vive en global.css, bajo html:not(.no-js) y solo con
+ * `prefers-reduced-motion: no-preference` — esta función únicamente
+ * anima HACIA el estado visible; nunca declara el "from", para que CSS
+ * siga siendo la única fuente de verdad de ese estado inicial (ver
+ * BaseLayout.astro para el script que quita "no-js" antes del primer
+ * pintado).
+ */
+export function inicializarEntradaHero(): void {
+  respetaMovimiento.add('(prefers-reduced-motion: no-preference)', () => {
+    const eyebrow = document.querySelector<HTMLElement>('[data-hero-anim="eyebrow"]');
+    const linea = document.querySelector<HTMLElement>('[data-hero-anim="line"]');
+    const titulo = document.querySelector<HTMLElement>('[data-hero-anim="title"]');
+    const parrafo = document.querySelector<HTMLElement>('[data-hero-anim="lead"]');
+    const ctas = gsap.utils.toArray<HTMLElement>('[data-hero-anim="cta"]');
+
+    if (!eyebrow || !linea || !titulo || !parrafo || ctas.length === 0) return;
+
+    gsap
+      .timeline({ defaults: { ease: 'power2.out' } })
+      .to(eyebrow, { opacity: 1, y: 0, duration: 0.4 })
+      .to(linea, { scaleX: 1, duration: 0.5, ease: 'power3.out' }, '<')
+      .to(titulo, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.75, ease: 'expo.out' }, '-=0.1')
+      .to(parrafo, { opacity: 1, y: 0, duration: 0.5 }, '-=0.3')
+      .to(ctas, { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.08 }, '-=0.2');
+  });
+}
+
+// TODO(fase 4): hover de tarjetas de servicio — ver tabla de
+// microinteracciones de la propuesta.

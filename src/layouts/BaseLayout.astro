@@ -16,7 +16,7 @@ const { title, description } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" class="no-js">
   <head>
     <meta charset="utf-8" />
     <script is:inline>
@@ -37,6 +37,14 @@ const { title, description } = Astro.props;
         }
       })();
     </script>
+    <script is:inline>
+      // Bloqueante a propósito: quita "no-js" antes del primer pintado.
+      // global.css oculta los elementos [data-hero-anim] solo bajo
+      // html:not(.no-js) — así, sin JS (o si este script falla), el
+      // contenido del Hero queda visible por defecto (fallback de
+      // accesibilidad) en vez de depender de que la animación corra.
+      document.documentElement.classList.remove('no-js');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
@@ -54,8 +62,9 @@ const { title, description } = Astro.props;
 
     <script>
       // Punto único de inicialización de animaciones (Fase 4).
-      import { inicializarContadores } from '@/lib/gsap/animations';
+      import { inicializarContadores, inicializarEntradaHero } from '@/lib/gsap/animations';
       inicializarContadores();
+      inicializarEntradaHero();
 
       // Reveals de scroll — pendiente de activar cuando existan
       // elementos con data-animate="fade-up" (ver tabla de
