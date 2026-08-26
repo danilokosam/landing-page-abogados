@@ -24,16 +24,28 @@
 import { Icon } from 'astro-icon/components';
 import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
 
-// Nota de implementación (bloqueo de scroll): se probó delegar el
-// bloqueo en `ScrollSmoother.get()?.paused()` cuando hay un
-// ScrollSmoother activo, asumiendo que evitaría desincronizar su
-// posición interna frente a manipular `window.scrollTo()` a mano. Se
-// verificó en el navegador que `paused(true)` reinicia `window.scrollY`
-// a 0 en este montaje concreto (efecto secundario no documentado, no
-// deseado) — se descartó ese camino en favor del patrón manual de
-// abajo, verificado explícitamente con navegación secuencial entre
-// varias secciones (Contacto → Sobre Nosotros) antes de darlo por
-// bueno. Ver PROJECT_STATE.md para más detalle si esto se retoma.
+// Nota de implementación (bloqueo de scroll, revisitada): un intento
+// anterior de usar `ScrollSmoother.get()?.paused()` se descartó porque
+// parecía reiniciar window.scrollY a 0. Investigando el propio código
+// fuente de gsap/ScrollSmoother.js: paused(true) NO toca el layout en
+// absoluto — internamente usa ScrollTrigger.observe({preventDefault:true,
+// type:'wheel,touch,scroll', onChangeY: () => scrollTop(-currentY)}) para
+// rechazar el input de scroll, preservando currentY intacto; paused(false)
+// simplemente recalcula el progreso a partir de ese mismo currentY. El
+// reinicio a 0 que se observó no venía de paused() en sí, sino de
+// combinarlo con el bloqueo manual de abajo (position:fixed en <body>) al
+// mismo tiempo: ScrollSmoother fija la altura de <body> en su propio
+// refreshHeight() para poder scrollear de forma nativa — poner ese mismo
+// <body> en position:fixed lo saca del flujo normal, colapsa la altura
+// scrolleable real de <html> a la del viewport mientras el menú está
+// abierto, y desincroniza la posición interna de ScrollSmoother respecto
+// al scroll real (el bug reportado: la siguiente animación arranca desde
+// 0). La solución correcta es no mezclar ambos mecanismos: cuando hay un
+// ScrollSmoother activo se usa su propio paused() (no toca <body> en
+// absoluto); solo se recurre al patrón manual de position:fixed cuando NO
+// hay ScrollSmoother (táctil o prefers-reduced-motion — ver
+// esDispositivoTactil() en scrollSmoother.ts), caso en el que no hay
+// ningún estado de ScrollSmoother que preservar.
 
 interface Enlace {
   href: string;
@@ -94,23 +106,47 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
 </details>
 
 <script>
+  // Import dentro del propio <script>, no en el frontmatter: Astro compila
+  // el frontmatter y los <script> del cliente como módulos completamente
+  // separados — un import de frontmatter no es visible aquí.
+  import { ScrollSmoother } from '@/lib/gsap/setup';
+
   const detalles = document.getElementById('menu-movil');
   const boton = document.getElementById('menu-movil-boton');
 
   if (detalles instanceof HTMLDetailsElement && boton) {
     let scrollGuardado = 0;
     let bloqueado = false;
+    // Referencia capturada en bloquearScroll() y reutilizada tal cual en
+    // restaurarScroll(), en vez de volver a llamar a ScrollSmoother.get()
+    // en ese momento: así ambas mitades del bloqueo quedan consistentes
+    // aunque el estado global de ScrollSmoother cambiase mientras el menú
+    // está abierto (p. ej. el usuario alterna prefers-reduced-motion en el
+    // sistema operativo a media navegación).
+    let smootherBloqueado: ScrollSmoother | null = null;
 
-    // Patrón robusto de bloqueo de scroll (a prueba de iOS Safari, que
-    // ignora overflow:hidden en el body mientras el usuario arrastra):
-    // fija el body en su posición actual con position:fixed y lo
-    // restaura al cerrar, sin perder el punto de scroll original.
-    // Ambas funciones son idempotentes (protegidas por `bloqueado`)
-    // porque restaurarScroll() se llama desde dos sitios distintos —
-    // ver más abajo por qué.
+    // Ambas funciones son idempotentes (protegidas por `bloqueado`) porque
+    // restaurarScroll() se llama desde dos sitios distintos — ver más abajo
+    // por qué.
     function bloquearScroll(): void {
       if (bloqueado) return;
       bloqueado = true;
+
+      smootherBloqueado = ScrollSmoother.get() ?? null;
+      if (smootherBloqueado) {
+        // ScrollSmoother activo: su propio paused(true) es lo correcto
+        // aquí — congela el scroll sin tocar el layout de <body> en
+        // absoluto (ver nota de implementación arriba), así que su
+        // posición interna nunca se desincroniza del scroll real.
+        smootherBloqueado.paused(true);
+        return;
+      }
+
+      // Sin ScrollSmoother (táctil o prefers-reduced-motion): patrón
+      // robusto a prueba de iOS Safari, que ignora overflow:hidden en el
+      // body mientras el usuario arrastra — fija el body en su posición
+      // actual con position:fixed y lo restaura al cerrar, sin perder el
+      // punto de scroll original.
       scrollGuardado = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollGuardado}px`;
@@ -121,19 +157,22 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
     function restaurarScroll(): void {
       if (!bloqueado) return;
       bloqueado = false;
+
+      if (smootherBloqueado) {
+        smootherBloqueado.paused(false);
+        smootherBloqueado = null;
+        return;
+      }
+
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
-      // behavior:'instant' explícito a propósito: la forma de dos argumentos
-      // de scrollTo() usa behavior:'auto', que hereda `scroll-behavior:
-      // smooth` de <html> (global.css) y anima esta restauración. Esa
-      // animación competía por el scroll con la que arranca justo después
-      // al navegar (la nativa del enlace, o smoother.scrollTo() si
-      // ScrollSmoother está activo) y la interrumpía casi de inmediato,
-      // produciendo un salto visible a 0 antes de animar hacia el destino
-      // real. Al ser instantánea, cuando arranca esa segunda animación el
-      // scroll ya está asentado en la posición guardada.
+      // behavior:'instant' explícito a propósito: la forma de dos
+      // argumentos de scrollTo() usa behavior:'auto', que hereda
+      // `scroll-behavior: smooth` de <html> (global.css) y animaría esta
+      // restauración, compitiendo por el scroll con la navegación nativa
+      // que arranca justo después.
       window.scrollTo({ top: scrollGuardado, left: 0, behavior: 'instant' });
     }
 
