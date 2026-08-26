@@ -125,7 +125,16 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
       document.body.style.top = '';
       document.body.style.left = '';
       document.body.style.right = '';
-      window.scrollTo(0, scrollGuardado);
+      // behavior:'instant' explícito a propósito: la forma de dos argumentos
+      // de scrollTo() usa behavior:'auto', que hereda `scroll-behavior:
+      // smooth` de <html> (global.css) y anima esta restauración. Esa
+      // animación competía por el scroll con la que arranca justo después
+      // al navegar (la nativa del enlace, o smoother.scrollTo() si
+      // ScrollSmoother está activo) y la interrumpía casi de inmediato,
+      // produciendo un salto visible a 0 antes de animar hacia el destino
+      // real. Al ser instantánea, cuando arranca esa segunda animación el
+      // scroll ya está asentado en la posición guardada.
+      window.scrollTo({ top: scrollGuardado, left: 0, behavior: 'instant' });
     }
 
     // Reacciona al estado real de <details> para abrir/cerrar el
