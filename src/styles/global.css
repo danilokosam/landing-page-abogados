@@ -165,6 +165,25 @@ body {
 }
 
 /*
+ * Recorte horizontal del wrapper de ScrollSmoother — siempre, no solo
+ * cuando ScrollSmoother se inicializa. Los bloques [data-reveal="left"]/
+ * ["right"] de abajo parten con transform: translateX(∓40px) antes de
+ * dispararse; sin nada que los recorte, ese desplazamiente empuja el
+ * ancho scrolleable del documento más allá del viewport (scrollbar
+ * horizontal). En escritorio pasa desapercibido porque GSAP le pone su
+ * propio overflow:hidden a #smooth-wrapper al crear el ScrollSmoother
+ * (ver scrollSmoother.ts) — pero esDispositivoTactil() bypasea
+ * ScrollSmoother por completo en móvil, así que ese wrapper nunca recibe
+ * ese overflow:hidden ahí y el desbordamiento queda expuesto. overflow-x
+ * (no el shorthand overflow) a propósito: no debe tocar el
+ * comportamiento de scroll vertical nativo cuando ScrollSmoother está
+ * bypaseado.
+ */
+#smooth-wrapper {
+  overflow-x: hidden;
+}
+
+/*
  * Borde inferior del Header — línea de acento con resplandor sutil,
  * estática a propósito (ver PROJECT_STATE.md, evaluación de alternativas
  * de Fase 3: se descartó una barra de progreso de scroll y una transición
