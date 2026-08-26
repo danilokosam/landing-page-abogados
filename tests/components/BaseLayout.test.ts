@@ -50,4 +50,29 @@ describe('BaseLayout', () => {
     const smoothContent = dom.window.document.querySelector('#smooth-content');
     expect(smoothContent?.querySelector('#main-stub')).not.toBeNull();
   });
+
+  it('renderiza el fondo ambiental como decorativo, fuera del flujo y sin interceptar clics', () => {
+    const fondo = dom.window.document.querySelector('#fondo-ambiental');
+    expect(fondo).not.toBeNull();
+
+    // Puramente decorativo: no debe aportar nada al árbol de accesibilidad
+    // ni interceptar interacciones con el contenido real.
+    expect(fondo?.getAttribute('aria-hidden')).toBe('true');
+    expect(fondo?.className).toContain('pointer-events-none');
+
+    // fixed + -z-10: no debe afectar el flujo del documento (sin layout
+    // shift) y debe quedar siempre detrás de Header/MenuMovil (z-50/z-40)
+    // y del contenido normal.
+    expect(fondo?.className).toContain('fixed');
+    expect(fondo?.className).toContain('-z-10');
+  });
+
+  it('el fondo ambiental es hermano de #smooth-wrapper, no su descendiente (no lo transforma ScrollSmoother)', () => {
+    const smoothContent = dom.window.document.querySelector('#smooth-content');
+    const smoothWrapper = dom.window.document.querySelector('#smooth-wrapper');
+    const fondo = dom.window.document.querySelector('#fondo-ambiental');
+
+    expect(smoothContent?.contains(fondo)).toBe(false);
+    expect(smoothWrapper?.contains(fondo)).toBe(false);
+  });
 });

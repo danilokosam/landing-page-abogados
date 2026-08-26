@@ -59,6 +59,35 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <!--
+      Fondo ambiental — luces difusas fijas y estáticas (sin JS, sin GSAP)
+      que le dan profundidad a la página. Vive fuera de #smooth-content por
+      la misma razón que el Header: al ser position:fixed y hermano del
+      wrapper (no su descendiente), no lo afecta el transform que
+      ScrollSmoother aplica a #smooth-content, y se mantiene fijo respecto
+      al viewport mientras el usuario hace scroll. -z-10 lo deja siempre
+      detrás del Header/MenuMovil (z-50/z-40) y del contenido normal;
+      pointer-events-none y aria-hidden porque es puramente decorativo — no
+      debe interceptar clics ni aparecer en el árbol de accesibilidad. Los
+      colores vienen de --primary/--accent (ya definidos para claro/oscuro
+      en global.css), así que se adaptan solos entre temas sin duplicar
+      valores aquí.
+    -->
+    <div id="fondo-ambiental" aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div
+        class="bg-primary/10 dark:bg-primary/45 absolute -top-32 -left-24 h-96 w-96 rounded-full blur-3xl"
+      >
+      </div>
+      <div
+        class="bg-accent/10 dark:bg-accent/40 absolute top-1/4 -right-32 h-[28rem] w-[28rem] rounded-full blur-3xl"
+      >
+      </div>
+      <div
+        class="bg-accent/5 dark:bg-primary/35 absolute bottom-0 left-1/3 h-80 w-80 rounded-full blur-3xl"
+      >
+      </div>
+    </div>
+
+    <!--
       El Header (slot "fixed") vive fuera de #smooth-content a propósito:
       ScrollSmoother transforma #smooth-content para simular el scroll, y
       cualquier position: sticky/fixed DENTRO de un ancestro transformado

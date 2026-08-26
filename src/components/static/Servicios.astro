@@ -5,7 +5,7 @@ import TarjetaServicio from './TarjetaServicio.astro';
 const servicios = (await getCollection('servicios')).sort((a, b) => a.data.orden - b.data.orden);
 ---
 
-<section id="servicios" class="border-border bg-muted scroll-mt-20 border-b">
+<section id="servicios" class="border-border bg-muted/95 scroll-mt-20 border-b">
   <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
     <div class="max-w-2xl" data-reveal="up">
       <p class="text-accent text-sm font-semibold tracking-widest uppercase">Áreas de práctica</p>
