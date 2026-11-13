@@ -5,9 +5,7 @@ test.describe('Navegación por anclajes con ScrollSmoother (escritorio, sin redu
     await page.goto('/');
   });
 
-  test('ScrollSmoother queda activo: fija #smooth-wrapper con position:fixed', async ({
-    page,
-  }) => {
+  test('ScrollSmoother queda activo: fija #smooth-wrapper con position:fixed', async ({ page }) => {
     // Efecto colateral documentado de ScrollSmoother.create({ smooth: 1.2, ... }):
     // fuerza position:fixed/overflow:hidden en el wrapper. Es la señal más
     // fiable, sin instrumentar la app, de que el plugin sí se inicializó.

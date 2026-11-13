@@ -6,6 +6,11 @@
  * Fase 2 (ver PROJECT_STATE.md).
  */
 import '@/styles/global.css';
+import IntroCarga from '@/components/static/IntroCarga.astro';
+// URL con hash de la fuente de los titulares (Playfair 500, subset latin):
+// se precarga para que ni la intro ni el titular del Hero (LCP) pinten
+// primero con la fuente de reserva y "salten" al cambiarla.
+import playfair500 from '@fontsource/playfair-display/files/playfair-display-latin-500-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -44,6 +49,59 @@ const { title, description } = Astro.props;
       // contenido queda visible por defecto en vez de depender de GSAP.
       document.documentElement.classList.remove('no-js');
     </script>
+    <script is:inline>
+      // Intro de carga (IntroCarga.astro). Bloqueante a propósito: la clase
+      // debe estar en <html> antes del primer pintado para que el telón
+      // aparezca desde el fotograma 0, sin destello del contenido debajo.
+      // Solo se muestra:
+      //   - una vez por sesión (no castiga a quien recarga o vuelve),
+      //   - sin prefers-reduced-motion,
+      //   - fuera de navegadores automatizados (navigator.webdriver: tests
+      //     e2e de Playwright, que interactúan con la página al instante).
+      // Clic o Escape la saltan. Se retira sola a los 3 s.
+      (function () {
+        try {
+          var d = document.documentElement;
+          if (
+            navigator.webdriver ||
+            sessionStorage.getItem('intro-vista') ||
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          )
+            return;
+          sessionStorage.setItem('intro-vista', '1');
+          d.classList.add('intro', 'intro-activa');
+
+          var terminada = false;
+          function terminar(saltada) {
+            if (terminada) return;
+            terminada = true;
+            clearTimeout(temporizador);
+            document.removeEventListener('click', alClic, true);
+            document.removeEventListener('keydown', alTeclear);
+            // Si se saltó, se quita también el retraso del Hero para que su
+            // entrada no se quede esperando a una intro que ya no está.
+            if (saltada) d.classList.remove('intro');
+            d.classList.remove('intro-activa');
+            var el = document.getElementById('intro');
+            if (el) el.remove();
+          }
+          function alClic(e) {
+            if (e.target instanceof Element && e.target.closest('#intro')) terminar(true);
+          }
+          function alTeclear(e) {
+            if (e.key === 'Escape') terminar(true);
+          }
+          var temporizador = setTimeout(function () {
+            terminar(false);
+          }, 3000);
+          document.addEventListener('click', alClic, true);
+          document.addEventListener('keydown', alTeclear);
+        } catch (error) {
+          // sessionStorage/matchMedia inaccesibles: sin intro, nunca bloquea.
+        }
+      })();
+    </script>
+    <link rel="preload" href={playfair500} as="font" type="font/woff2" crossorigin />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f7f4ee" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0c0e13" media="(prefers-color-scheme: dark)" />
@@ -59,6 +117,8 @@ const { title, description } = Astro.props;
     <meta property="og:description" content={description} />
   </head>
   <body>
+    <IntroCarga />
+
     <!--
       Fondo ambiental — luces difusas fijas y estáticas (sin JS). Los
       degradados viven en global.css (#fondo-ambiental) como

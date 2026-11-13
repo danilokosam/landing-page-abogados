@@ -36,9 +36,7 @@ describe('MenuMovil (marcado estático)', () => {
   });
 
   it('renderiza un enlace marcado con data-menu-movil-enlace por cada entrada, en orden', () => {
-    const items = Array.from(
-      dom.window.document.querySelectorAll('[data-menu-movil-enlace]'),
-    );
+    const items = Array.from(dom.window.document.querySelectorAll('[data-menu-movil-enlace]'));
     // enlaces.length de navegación + 1 (el CTA de WhatsApp al final)
     expect(items).toHaveLength(enlaces.length + 1);
 

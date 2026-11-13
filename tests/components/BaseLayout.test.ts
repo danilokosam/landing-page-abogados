@@ -21,9 +21,9 @@ describe('BaseLayout', () => {
 
   it('renderiza el título y la descripción recibidos por props', () => {
     expect(dom.window.document.querySelector('title')?.textContent).toBe('Título de prueba');
-    expect(dom.window.document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
-      'Descripción de prueba',
-    );
+    expect(
+      dom.window.document.querySelector('meta[name="description"]')?.getAttribute('content'),
+    ).toBe('Descripción de prueba');
   });
 
   it('coloca el slot "fixed" fuera de #smooth-content, como hermano previo de #smooth-wrapper', () => {

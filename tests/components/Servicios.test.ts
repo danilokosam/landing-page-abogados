@@ -33,10 +33,12 @@ describe('Servicios', () => {
   });
 
   it('renderiza cada servicio en el orden definido por su campo "orden"', async () => {
-    const servicios = (await getCollection('servicios')).sort((a, b) => a.data.orden - b.data.orden);
-    const titulos = Array.from(
-      dom.window.document.querySelectorAll('[data-reveal-grid] h3'),
-    ).map((el) => el.textContent);
+    const servicios = (await getCollection('servicios')).sort(
+      (a, b) => a.data.orden - b.data.orden,
+    );
+    const titulos = Array.from(dom.window.document.querySelectorAll('[data-reveal-grid] h3')).map(
+      (el) => el.textContent,
+    );
     expect(titulos).toEqual(servicios.map((s) => s.data.titulo));
   });
 });

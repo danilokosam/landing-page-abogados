@@ -57,9 +57,9 @@ describe('Página de inicio (composición completa)', () => {
 
     // Botones/enlaces que sólo contienen un icono decorativo (sin texto visible)
     // deben exponer un nombre accesible vía aria-label.
-    const controlesSoloIcono = Array.from(
-      dom.window.document.querySelectorAll('button, a'),
-    ).filter((el) => (el.textContent ?? '').trim() === '' && el.querySelector('svg'));
+    const controlesSoloIcono = Array.from(dom.window.document.querySelectorAll('button, a')).filter(
+      (el) => (el.textContent ?? '').trim() === '' && el.querySelector('svg'),
+    );
     for (const control of controlesSoloIcono) {
       expect(control.getAttribute('aria-label')).toBeTruthy();
     }

@@ -84,6 +84,17 @@ Pedido: que la página se vea elegante y premium, y que cargue lo más rápido p
 - Se descartó `lg:sticky` en la columna de Sobre nosotros: `position: sticky` no funciona dentro de `#smooth-content` (transformado por ScrollSmoother).
 - Verificado: `astro check` (0 errores), `astro build`, 55/55 tests unitarios, 61/61 e2e (incluido axe WCAG AA en claro y oscuro, escritorio y Pixel 7), revisión visual en navegador (claro/oscuro, escritorio) y capturas de Playwright en Pixel 7 (el redimensionado del navegador sigue sin funcionar en este entorno).
 
+## Intro de carga (13 de noviembre de 2026, rama `design/intro-animacion`)
+
+Animación a pantalla completa de ~2.9 s antes de mostrar el contenido (`src/components/static/IntroCarga.astro`): telón de tinta, una balanza de la justicia se dibuja en trazo dorado (`stroke-dashoffset` con `pathLength="1"`), el brazo oscila y se equilibra con los platillos sincronizados, aparece el nombre del despacho con revelado desde abajo y el telón sube (`translateY(-100%)`) revelando la página. La entrada del Hero se desplaza con la variable CSS `--retraso-intro` (2.25 s bajo `html.intro`) para arrancar justo cuando sube el telón.
+
+- **Coste:** SVG inline de ~1 KB y animaciones solo en CSS (transform/opacity/stroke). Sin GSAP, sin JS por fotograma y sin imágenes. Se añadió `<link rel="preload">` de Playfair 500 latin (misma URL con hash que usa el CSS, verificado en `dist/`), que también beneficia al titular del Hero.
+- **Cuándo se muestra:** lo decide un script bloqueante en el `<head>` de `BaseLayout.astro`, que añade `intro intro-activa` a `<html>` antes del primer pintado. Solo ocurre en la primera visita de la sesión (`sessionStorage['intro-vista']`), sin `prefers-reduced-motion` y fuera de navegadores automatizados (`navigator.webdriver`, para no interferir con la suite e2e). Sin JS o sin la clase, el overlay es `display:none`.
+- **Escape/clic la saltan.** Al saltarla también se quita `intro`, para que el Hero no espere. A los 3 s se elimina del DOM y se libera el scroll (`html.intro-activa { overflow: hidden }`).
+- **Tests:** `tests/e2e/intro.spec.ts` (simula `webdriver=false`) cubre aparición y retirada en menos de 3.5 s, no repetición en la misma sesión, salto con clic, reduced-motion y omisión en webdriver.
+- **Nota de verificación:** con `astro dev` en frío la intro puede no verse, porque Vite inyecta el CSS por JS y tarda más que los 3 s del temporizador. Hay que revisarla con `astro build && astro preview`. Se verificó con capturas fotograma a fotograma en escritorio y Pixel 7 sobre el build de producción.
+- **Compromiso conocido:** el contenido real se muestra unos 2.3 s más tarde en la primera visita. Es inherente a una intro de este tipo y se limita a una vez por sesión.
+
 ## Roadmap de fases
 
 - [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. _(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)_

@@ -1,0 +1,232 @@
+---
+/**
+ * Intro de carga a pantalla completa (~2.9 s): una balanza de la justicia
+ * se dibuja en trazo dorado, el brazo oscila y se equilibra (la idea:
+ * "su caso, en equilibrio"), aparece el nombre del despacho y el telón
+ * de tinta sube revelando la página.
+ *
+ * Coste mínimo a propósito: SVG inline (~1 KB), animaciones 100% CSS
+ * (transform/opacity/stroke-dashoffset — sin GSAP, sin JS por fotograma)
+ * y ninguna imagen ni fuente extra (reutiliza Playfair, ya precargada).
+ *
+ * Este componente NO decide si se muestra: eso lo hace el script
+ * bloqueante de BaseLayout.astro, que añade `intro intro-activa` a <html>
+ * solo en la primera visita de la sesión, si el usuario no pidió
+ * movimiento reducido y si no es un navegador automatizado (tests e2e).
+ * Sin esa clase (o sin JS) el overlay es display:none — nunca bloquea.
+ */
+import { negocio } from '@/lib/negocio';
+
+// "Duarte & Iglesias Abogados" → "Duarte & Iglesias" (el "Abogados" va
+// como subtítulo en versalitas, debajo).
+const nombre = negocio.nombreDespacho.replace(/\s+Abogados$/i, '');
+---
+
+<div id="intro" aria-hidden="true">
+  <div class="intro-contenido">
+    <svg
+      aria-hidden="true"
+      class="balanza"
+      viewBox="0 0 120 120"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <!-- Columna y base -->
+      <path pathLength="1" style="--i: 0" d="M60 22 V102"></path>
+      <path pathLength="1" style="--i: 1" d="M42 104 H78"></path>
+      <path pathLength="1" style="--i: 1" d="M50 102 Q60 96 70 102"></path>
+      <circle pathLength="1" style="--i: 0" cx="60" cy="18" r="3"></circle>
+
+      <!-- Brazo: oscila y se equilibra -->
+      <g class="brazo">
+        <path pathLength="1" style="--i: 2" d="M22 32 H98"></path>
+      </g>
+
+      <!-- Platillos: suben/bajan en sincronía con el brazo -->
+      <g class="platillo platillo-izq">
+        <path pathLength="1" style="--i: 3" d="M24 32 L14 66 M24 32 L34 66"></path>
+        <path pathLength="1" style="--i: 4" d="M10 66 H38 Q36 76 24 76 Q12 76 10 66 Z"></path>
+      </g>
+      <g class="platillo platillo-der">
+        <path pathLength="1" style="--i: 3" d="M96 32 L86 66 M96 32 L106 66"></path>
+        <path pathLength="1" style="--i: 4" d="M82 66 H110 Q108 76 96 76 Q84 76 82 66 Z"></path>
+      </g>
+    </svg>
+
+    <p class="intro-nombre"><span>{nombre}</span></p>
+    <span class="intro-linea"></span>
+    <p class="intro-sub"><span>Abogados · {negocio.direccion.ciudad}</span></p>
+  </div>
+</div>
+
+<style>
+  /* Oculto por defecto: solo existe visualmente con html.intro-activa */
+  #intro {
+    display: none;
+  }
+
+  :global(html.intro-activa) {
+    overflow: hidden; /* sin scroll de fondo mientras dura la intro */
+  }
+
+  :global(html.intro-activa) #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(40rem 28rem at 50% 45%, rgb(207 174 118 / 0.08), transparent 70%), var(--ink);
+    color: var(--ink-gold);
+    cursor: pointer; /* clic = saltar la intro */
+    will-change: transform;
+    animation: telon 0.85s cubic-bezier(0.76, 0, 0.24, 1) 2.05s forwards;
+  }
+
+  /* Hairline dorada en el borde inferior del telón mientras sube */
+  :global(html.intro-activa) #intro::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--ink-gold), transparent);
+  }
+
+  .intro-contenido {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: contenido-sale 0.5s ease-in 1.95s forwards;
+  }
+
+  /* --- Balanza --------------------------------------------------- */
+  .balanza {
+    width: clamp(84px, 16vw, 128px);
+    height: auto;
+    overflow: visible;
+  }
+
+  .balanza :is(path, circle) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: trazo 0.7s cubic-bezier(0.65, 0, 0.35, 1) calc(0.1s + var(--i) * 0.14s) forwards;
+  }
+
+  .brazo {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: oscila 1.1s cubic-bezier(0.34, 1.4, 0.64, 1) 0.75s both;
+  }
+
+  .platillo-izq {
+    animation: platillo-izq 1.1s cubic-bezier(0.34, 1.4, 0.64, 1) 0.75s both;
+  }
+  .platillo-der {
+    animation: platillo-der 1.1s cubic-bezier(0.34, 1.4, 0.64, 1) 0.75s both;
+  }
+
+  /* --- Tipografía ------------------------------------------------ */
+  .intro-nombre,
+  .intro-sub {
+    overflow: hidden; /* máscara para el revelado desde abajo */
+  }
+  .intro-nombre > span,
+  .intro-sub > span {
+    display: block;
+    transform: translateY(110%);
+    animation: texto-sube 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .intro-nombre {
+    margin-top: 1.75rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink-foreground);
+  }
+  .intro-nombre > span {
+    animation-delay: 0.85s;
+  }
+
+  .intro-linea {
+    display: block;
+    width: 4.5rem;
+    height: 1px;
+    margin-block: 1.1rem 0.9rem;
+    background: var(--ink-gold);
+    transform: scaleX(0);
+    animation: linea 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.15s forwards;
+  }
+
+  .intro-sub {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    padding-left: 0.4em; /* compensa el tracking del último carácter */
+  }
+  .intro-sub > span {
+    animation-delay: 1.25s;
+  }
+
+  /* --- Keyframes ------------------------------------------------- */
+  @keyframes trazo {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  /* El brazo arranca inclinado y se asienta en equilibrio con un leve rebote */
+  @keyframes oscila {
+    from {
+      transform: rotate(-7deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+  /* Con rotate(-7deg) el extremo izquierdo baja ~4.6px y el derecho sube */
+  @keyframes platillo-izq {
+    from {
+      transform: translateY(4.6px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes platillo-der {
+    from {
+      transform: translateY(-4.6px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes texto-sube {
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes linea {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes contenido-sale {
+    to {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  }
+  @keyframes telon {
+    to {
+      transform: translateY(-100%);
+    }
+  }
+</style>
