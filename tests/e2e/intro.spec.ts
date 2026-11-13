@@ -10,6 +10,16 @@ async function comoNavegadorReal(page: Page): Promise<void> {
 }
 
 test.describe('Intro de carga', () => {
+  // La intro se retira a los 3 s: si esta es la primera visita a un
+  // servidor de desarrollo recién arrancado, la compilación en frío puede
+  // comerse esa ventana. Se calienta antes con una visita sin intro
+  // (webdriver real = true → se omite).
+  test.beforeAll(async ({ browser }) => {
+    const pagina = await browser.newPage();
+    await pagina.goto('/');
+    await pagina.close();
+  });
+
   test('se muestra a pantalla completa en la primera visita y se retira sola en ~3 s', async ({
     page,
   }) => {

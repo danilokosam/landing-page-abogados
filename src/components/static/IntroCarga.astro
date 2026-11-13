@@ -70,6 +70,16 @@ const nombre = negocio.nombreDespacho.replace(/\s+Abogados$/i, '');
 
   :global(html.intro-activa) {
     overflow: hidden; /* sin scroll de fondo mientras dura la intro */
+    /* overflow:hidden oculta la barra de desplazamiento; sin reservar su
+       hueco, al terminar la intro la barra reaparecía, estrechaba el
+       viewport ~15px y todo el contenido saltaba (layout shift). Con el
+       hueco reservado solo durante la intro, al quitar la clase la barra
+       ocupa exactamente ese mismo espacio en el mismo fotograma. Sin
+       efecto con barras superpuestas (móvil, macOS). */
+    scrollbar-gutter: stable;
+    /* El hueco queda fuera del overlay fixed y pinta el fondo de <html>:
+       en tinta, para que no se vea una franja clara junto al telón. */
+    background-color: var(--ink);
   }
 
   :global(html.intro-activa) #intro {
