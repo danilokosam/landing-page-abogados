@@ -75,48 +75,50 @@ const enlaceClase =
         <h3 class="text-ink-foreground text-xs font-semibold tracking-[0.18em] uppercase">
           Contacto
         </h3>
-        <ul class="mt-5 space-y-3.5 text-sm">
-          <li class="flex items-start gap-3">
-            <Icon
-              name="lucide:map-pin"
-              class="text-ink-gold mt-0.5 h-4 w-4 shrink-0"
-              aria-hidden="true"
-            />
-            <span>
-              {
-                negocio.direccion.calle && (
-                  <>
-                    {negocio.direccion.calle}
-                    <br />
-                  </>
-                )
-              }
-              {`${negocio.direccion.ciudad}, ${negocio.direccion.region}`}
-            </span>
-          </li>
-          <li class="flex items-center gap-3">
-            <Icon name="lucide:phone" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
-            <a href={`tel:${negocio.telefonoWhatsapp}`} class={enlaceClase}
-              >{formatearTelefono(negocio.telefonoWhatsapp)}</a
-            >
-          </li>
-          <li class="flex items-center gap-3">
-            <Icon name="lucide:mail" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
-            <a href={`mailto:${negocio.email}`} class={enlaceClase}>{negocio.email}</a>
-          </li>
-          {
-            negocio.horario.length > 0 && (
-              <li class="flex items-center gap-3">
-                <Icon
-                  name="lucide:clock"
-                  class="text-ink-gold h-4 w-4 shrink-0"
-                  aria-hidden="true"
-                />
-                {negocio.horario.map((h) => `${h.dias}: ${h.horas}`).join(' · ')}
-              </li>
-            )
-          }
-        </ul>
+        <address class="not-italic">
+          <ul class="mt-5 space-y-3.5 text-sm">
+            <li class="flex items-start gap-3">
+              <Icon
+                name="lucide:map-pin"
+                class="text-ink-gold mt-0.5 h-4 w-4 shrink-0"
+                aria-hidden="true"
+              />
+              <span>
+                {
+                  negocio.direccion.calle && (
+                    <>
+                      {negocio.direccion.calle}
+                      <br />
+                    </>
+                  )
+                }
+                {`${negocio.direccion.ciudad}, ${negocio.direccion.region}`}
+              </span>
+            </li>
+            <li class="flex items-center gap-3">
+              <Icon name="lucide:phone" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
+              <a href={`tel:${negocio.telefonoWhatsapp}`} class={enlaceClase}
+                >{formatearTelefono(negocio.telefonoWhatsapp)}</a
+              >
+            </li>
+            <li class="flex items-center gap-3">
+              <Icon name="lucide:mail" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
+              <a href={`mailto:${negocio.email}`} class={enlaceClase}>{negocio.email}</a>
+            </li>
+            {
+              negocio.horario.length > 0 && (
+                <li class="flex items-center gap-3">
+                  <Icon
+                    name="lucide:clock"
+                    class="text-ink-gold h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  {negocio.horario.map((h) => `${h.dias}: ${h.horas}`).join(' · ')}
+                </li>
+              )
+            }
+          </ul>
+        </address>
       </div>
 
       <div>

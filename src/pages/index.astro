@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/static/Header.astro';
 import Hero from '@/components/static/Hero.astro';
@@ -6,13 +7,24 @@ import CifrasClave from '@/components/static/CifrasClave.astro';
 import SobreNosotros from '@/components/static/SobreNosotros.astro';
 import Servicios from '@/components/static/Servicios.astro';
 import Footer from '@/components/static/Footer.astro';
-import { negocio } from '@/lib/negocio';
+import { seo, urlAbsoluta } from '@/lib/seo';
+import { generarGrafoSchema, serializarJsonLd } from '@/lib/schema';
+
+const socios = (await getCollection('socios')).sort((a, b) => a.data.orden - b.data.orden);
+const servicios = (await getCollection('servicios')).sort((a, b) => a.data.orden - b.data.orden);
+
+const jsonLd = serializarJsonLd(
+  generarGrafoSchema({
+    urlSitio: urlAbsoluta('/', Astro.site),
+    urlImagen: urlAbsoluta(seo.og.imagen, Astro.site),
+    socios,
+    servicios,
+  }),
+);
 ---
 
-<BaseLayout
-  title={`${negocio.nombreDespacho} — Abogados en ${negocio.direccion.ciudad}`}
-  description={negocio.descripcionCorta}
->
+<BaseLayout title={seo.titulo} description={seo.descripcion}>
+  <script slot="head" type="application/ld+json" is:inline set:html={jsonLd} />
   <Header slot="fixed" />
   <main>
     <Hero />

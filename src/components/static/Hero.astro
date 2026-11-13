@@ -37,19 +37,29 @@ const pasos = [
     class="mx-auto grid max-w-7xl items-center gap-14 px-5 pt-16 pb-20 sm:px-8 lg:grid-cols-12 lg:gap-10 lg:px-10 lg:pt-24 lg:pb-28"
   >
     <div class="lg:col-span-7">
-      <p data-hero-anim="eyebrow" class="eyebrow">
-        Abogados en {negocio.direccion.ciudad}
-      </p>
-      <span
-        data-hero-anim="line"
-        aria-hidden="true"
-        class="bg-border mt-6 mb-7 block h-px w-full max-w-md origin-left"></span>
-      <h1
-        data-hero-anim="title"
-        class="text-foreground font-serif text-[2.6rem] leading-[1.06] font-medium tracking-[-0.015em] text-balance sm:text-6xl lg:text-[4.4rem]"
-      >
-        Asesoramiento jurídico <em class="text-accent font-medium">claro</em>, en el momento en que
-        lo necesita
+      {
+        /*
+          SEO: el subtítulo "Abogados en <ciudad>" forma parte del <h1> (antes
+          era un <p> suelto) para que el encabezado principal contenga la
+          búsqueda local clave. Visualmente no cambia nada: cada parte sigue
+          siendo un bloque con su propio estilo y su propia animación.
+        */
+      }
+      <h1>
+        <span data-hero-anim="eyebrow" class="eyebrow font-sans">
+          Abogados en {negocio.direccion.ciudad}
+        </span>
+        <span
+          data-hero-anim="line"
+          aria-hidden="true"
+          class="bg-border mt-6 mb-7 block h-px w-full max-w-md origin-left"></span>
+        <span
+          data-hero-anim="title"
+          class="text-foreground block font-serif text-[2.6rem] leading-[1.06] font-medium tracking-[-0.015em] text-balance sm:text-6xl lg:text-[4.4rem]"
+        >
+          Asesoramiento jurídico <em class="text-accent font-medium">claro</em>, en el momento en
+          que lo necesita
+        </span>
       </h1>
       <p
         data-hero-anim="lead"

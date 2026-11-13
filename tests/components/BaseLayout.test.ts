@@ -7,7 +7,10 @@ describe('BaseLayout', () => {
   let dom: JSDOM;
 
   beforeAll(async () => {
-    const container = await AstroContainer.create();
+    // `site` es necesario para las URLs absolutas (canonical, og:url, og:image).
+    const container = await AstroContainer.create({
+      astroConfig: { site: 'https://ejemplo.test' },
+    });
     const html = await container.renderToString(BaseLayout, {
       props: { title: 'Título de prueba', description: 'Descripción de prueba' },
       slots: {

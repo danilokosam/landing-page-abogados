@@ -1,20 +1,25 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { getCollection } from 'astro:content';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { JSDOM } from 'jsdom';
 import IndexPage from '@/pages/index.astro';
 import { negocio } from '@/lib/negocio';
+import { seo } from '@/lib/seo';
+
+const SITIO = 'https://ejemplo.test';
 
 describe('Página de inicio (composición completa)', () => {
   let dom: JSDOM;
 
   beforeAll(async () => {
-    const container = await AstroContainer.create();
+    // `site` es necesario para las URLs absolutas (canonical, og:url, og:image).
+    const container = await AstroContainer.create({ astroConfig: { site: SITIO } });
     const html = await container.renderToString(IndexPage, { partial: false });
     dom = new JSDOM(html);
   });
 
-  it('declara idioma "es" y un <title> que incluye el nombre del despacho', () => {
-    expect(dom.window.document.documentElement.getAttribute('lang')).toBe('es');
+  it('declara idioma "es-CO" y un <title> que incluye el nombre del despacho', () => {
+    expect(dom.window.document.documentElement.getAttribute('lang')).toBe('es-CO');
     expect(dom.window.document.querySelector('title')?.textContent).toContain(
       negocio.nombreDespacho,
     );
@@ -79,5 +84,69 @@ describe('Página de inicio (composición completa)', () => {
     for (const nav of navs) {
       expect(nav.getAttribute('aria-label')).toBeTruthy();
     }
+  });
+
+  describe('SEO del <head>', () => {
+    const meta = (selector: string) =>
+      dom.window.document.querySelector(selector)?.getAttribute('content');
+
+    it('usa el título y la descripción optimizados de seo.ts', () => {
+      expect(dom.window.document.title).toBe(seo.titulo);
+      expect(meta('meta[name="description"]')).toBe(seo.descripcion);
+    });
+
+    it('declara una URL canónica absoluta y permite indexar con vista previa grande', () => {
+      expect(dom.window.document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
+        `${SITIO}/`,
+      );
+      expect(meta('meta[name="robots"]')).toContain('index, follow');
+      expect(meta('meta[name="robots"]')).toContain('max-image-preview:large');
+    });
+
+    it('incluye la tarjeta Open Graph completa con imagen absoluta de 1200×630', () => {
+      expect(meta('meta[property="og:type"]')).toBe('website');
+      expect(meta('meta[property="og:url"]')).toBe(`${SITIO}/`);
+      expect(meta('meta[property="og:title"]')).toBe(seo.og.titulo);
+      expect(meta('meta[property="og:description"]')).toBe(seo.og.descripcion);
+      expect(meta('meta[property="og:image"]')).toBe(`${SITIO}${seo.og.imagen}`);
+      expect(meta('meta[property="og:image:width"]')).toBe('1200');
+      expect(meta('meta[property="og:image:height"]')).toBe('630');
+      expect(meta('meta[property="og:image:alt"]')).toBeTruthy();
+      expect(meta('meta[property="og:locale"]')).toBe('es_CO');
+      expect(meta('meta[property="og:site_name"]')).toBe(negocio.nombreDespacho);
+    });
+
+    it('incluye la tarjeta grande de Twitter/X', () => {
+      expect(meta('meta[name="twitter:card"]')).toBe('summary_large_image');
+      expect(meta('meta[name="twitter:image"]')).toBe(`${SITIO}${seo.og.imagen}`);
+    });
+
+    it('enlaza favicon, apple-touch-icon y manifest', () => {
+      const href = (sel: string) => dom.window.document.querySelector(sel)?.getAttribute('href');
+      expect(href('link[rel="icon"][type="image/svg+xml"]')).toBe('/favicon.svg');
+      expect(href('link[rel="apple-touch-icon"]')).toBe('/apple-touch-icon.png');
+      expect(href('link[rel="manifest"]')).toBe('/site.webmanifest');
+    });
+
+    it('emite un JSON-LD válido con LegalService, sus abogados y sus servicios', async () => {
+      const script = dom.window.document.querySelector('script[type="application/ld+json"]');
+      expect(script).not.toBeNull();
+      const grafo = JSON.parse(script!.textContent ?? '');
+      const despacho = grafo['@graph'].find(
+        (n: { '@type': string }) => n['@type'] === 'LegalService',
+      );
+      expect(despacho.name).toBe(negocio.nombreDespacho);
+      expect(despacho.url).toBe(`${SITIO}/`);
+      expect(despacho.employee).toHaveLength((await getCollection('socios')).length);
+      expect(despacho.hasOfferCatalog.itemListElement).toHaveLength(
+        (await getCollection('servicios')).length,
+      );
+    });
+
+    it('el <h1> contiene la búsqueda local clave ("Abogados en <ciudad>")', () => {
+      expect(dom.window.document.querySelector('h1')?.textContent).toContain(
+        `Abogados en ${negocio.direccion.ciudad}`,
+      );
+    });
   });
 });

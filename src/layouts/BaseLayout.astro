@@ -12,18 +12,79 @@ import IntroCarga from '@/components/static/IntroCarga.astro';
 // primero con la fuente de reserva y "salten" al cambiarla.
 import playfair500 from '@fontsource/playfair-display/files/playfair-display-latin-500-normal.woff2?url';
 
+import { seo, urlAbsoluta } from '@/lib/seo';
+import { negocio } from '@/lib/negocio';
+
 interface Props {
   title: string;
   description: string;
+  /** Excluye la página del índice (p. ej. la 404). */
+  noindex?: boolean;
+  /** Muestra la intro de carga (solo tiene sentido en la portada). */
+  intro?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false, intro = true } = Astro.props;
+
+// URLs absolutas: WhatsApp, Facebook, LinkedIn y X ignoran rutas relativas
+// en og:image/og:url. La base sale de `site` (astro.config.mjs).
+const urlCanonica = urlAbsoluta(Astro.url.pathname, Astro.site);
+const urlImagenOg = urlAbsoluta(seo.og.imagen, Astro.site);
 ---
 
 <!doctype html>
-<html lang="es" class="no-js">
+<html lang={seo.idioma} class="no-js" data-sin-intro={intro ? undefined : ''}>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- SEO básico -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {!noindex && <link rel="canonical" href={urlCanonica} />}
+    <meta
+      name="robots"
+      content={noindex
+        ? 'noindex, follow'
+        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+    />
+    <meta name="author" content={negocio.nombreDespacho} />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!--
+      Tarjeta al compartir el enlace (WhatsApp, Facebook, LinkedIn, X...).
+      Imagen 1200×630 en JPEG (<300 KB, límite práctico de WhatsApp),
+      generada con `npm run assets:seo` (scripts/generar-assets-seo.mjs).
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={negocio.nombreDespacho} />
+    <meta property="og:locale" content={seo.locale} />
+    <meta property="og:url" content={urlCanonica} />
+    <meta property="og:title" content={seo.og.titulo} />
+    <meta property="og:description" content={seo.og.descripcion} />
+    <meta property="og:image" content={urlImagenOg} />
+    <meta property="og:image:secure_url" content={urlImagenOg} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content={String(seo.og.imagenAncho)} />
+    <meta property="og:image:height" content={String(seo.og.imagenAlto)} />
+    <meta property="og:image:alt" content={seo.og.imagenAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={seo.og.titulo} />
+    <meta name="twitter:description" content={seo.og.descripcion} />
+    <meta name="twitter:image" content={urlImagenOg} />
+    <meta name="twitter:image:alt" content={seo.og.imagenAlt} />
+
+    <!-- Iconos y apariencia del navegador / pantalla de inicio -->
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f7f4ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0e13" media="(prefers-color-scheme: dark)" />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="preload" href={playfair500} as="font" type="font/woff2" crossorigin />
+
     <script is:inline>
       // Bloqueante a propósito: resuelve el tema antes del primer pintado
       // para evitar el parpadeo de tema incorrecto (FOUC). Duplica una
@@ -58,12 +119,14 @@ const { title, description } = Astro.props;
       //   - sin prefers-reduced-motion,
       //   - fuera de navegadores automatizados (navigator.webdriver: tests
       //     e2e de Playwright, que interactúan con la página al instante).
-      // Clic o Escape la saltan. Se retira sola a los 3 s.
+      // Clic o Escape la saltan. Se retira sola a los 3 s. Las páginas que
+      // no la quieren (404) marcan <html data-sin-intro> con la prop `intro`.
       (function () {
         try {
           var d = document.documentElement;
           if (
             navigator.webdriver ||
+            d.hasAttribute('data-sin-intro') ||
             sessionStorage.getItem('intro-vista') ||
             window.matchMedia('(prefers-reduced-motion: reduce)').matches
           )
@@ -101,23 +164,12 @@ const { title, description } = Astro.props;
         }
       })();
     </script>
-    <link rel="preload" href={playfair500} as="font" type="font/woff2" crossorigin />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f4ee" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0c0e13" media="(prefers-color-scheme: dark)" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-
-    <!-- OpenGraph — completar con imagen dedicada en Fase 5 -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <!-- Contenido extra del <head> por página (p. ej. JSON-LD) -->
+    <slot name="head" />
   </head>
   <body>
-    <IntroCarga />
+    {intro && <IntroCarga />}
 
     <!--
       Fondo ambiental — luces difusas fijas y estáticas (sin JS). Los
