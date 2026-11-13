@@ -14,7 +14,7 @@ const servicios = defineCollection({
       titulo: z.string(),
       resumen: z.string(),
       icono: z.string(), // nombre del icono Lucide, ej. "scale"
-      rangoHonorarios: z.string(), // texto libre, ej. "Desde $X" o "Consulta inicial gratuita"
+      rangoHonorarios: z.string().optional(), // texto libre; si se omite, la tarjeta no muestra honorarios
       mensajeWhatsapp: z.string(), // mensaje precargado específico del servicio
       orden: z.number().int().default(0),
       destacado: z.boolean().default(false),
@@ -32,6 +32,7 @@ const socios = defineCollection({
       foto: image(),
       formacion: z.array(z.string()), // títulos, universidades
       especialidades: z.array(z.string()), // áreas de práctica que domina
+      experiencia: z.array(z.string()).default([]), // cargos relevantes, del más reciente al más antiguo
       acreditaciones: z.array(z.string()).default([]), // colegiaturas, certificaciones
       numeroWhatsapp: z.string().optional(), // si atiende un canal propio; si no, usa el de negocio.ts
       orden: z.number().int().default(0),

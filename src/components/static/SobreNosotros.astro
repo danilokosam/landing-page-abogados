@@ -22,15 +22,16 @@ const sociosConContenido = await Promise.all(
           Sobre nosotros
         </h2>
         <p class="text-muted-foreground mt-6 text-base leading-relaxed sm:text-lg">
-          Un despacho de dos socios que combina más de dos décadas de práctica jurídica en Madrid,
-          con un trato directo y personal en cada caso.
+          Dos trayectorias complementarias: el ejercicio litigante y la docencia en Derecho Penal, y
+          más de dos décadas de experiencia dentro del sistema penitenciario.
         </p>
 
         <figure class="border-gold mt-10 border-l pl-6">
           <blockquote
             class="text-foreground font-serif text-xl leading-snug font-medium italic sm:text-2xl"
           >
-            «Su asunto nunca pasa a un tercero: lo lleva de principio a fin uno de los socios.»
+            «Su asunto nunca pasa a un tercero: lo lleva de principio a fin uno de nuestros
+            abogados.»
           </blockquote>
           <figcaption
             class="text-muted-foreground mt-4 text-xs font-semibold tracking-[0.18em] uppercase"
@@ -85,17 +86,33 @@ const sociosConContenido = await Promise.all(
                 </dd>
               </div>
 
-              <div>
-                <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
-                  <Icon name="lucide:award" class="text-accent h-4 w-4" aria-hidden="true" />
-                  Acreditaciones
-                </dt>
-                <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
-                  {socio.data.acreditaciones.map((item) => (
-                    <p>{item}</p>
-                  ))}
-                </dd>
-              </div>
+              {socio.data.experiencia.length > 0 && (
+                <div>
+                  <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
+                    <Icon name="lucide:briefcase" class="text-accent h-4 w-4" aria-hidden="true" />
+                    Experiencia
+                  </dt>
+                  <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
+                    {socio.data.experiencia.map((item) => (
+                      <p>{item}</p>
+                    ))}
+                  </dd>
+                </div>
+              )}
+
+              {socio.data.acreditaciones.length > 0 && (
+                <div>
+                  <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
+                    <Icon name="lucide:award" class="text-accent h-4 w-4" aria-hidden="true" />
+                    Acreditaciones
+                  </dt>
+                  <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
+                    {socio.data.acreditaciones.map((item) => (
+                      <p>{item}</p>
+                    ))}
+                  </dd>
+                </div>
+              )}
             </dl>
 
             <ul

@@ -6,7 +6,7 @@
  * enlace "Contacto" del menú aterrice directamente en ella.
  */
 import { Icon } from 'astro-icon/components';
-import { negocio } from '@/lib/negocio';
+import { formatearTelefono, negocio } from '@/lib/negocio';
 import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
 
 const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consulta.');
@@ -39,8 +39,8 @@ const enlaceClase =
           ¿Hablamos de su caso? <em class="text-ink-gold font-medium">Sin compromiso.</em>
         </h2>
         <p class="mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
-          Escríbanos por WhatsApp y un socio le responderá personalmente, normalmente en menos de 24
-          horas laborables.
+          Escríbanos por WhatsApp y uno de nuestros abogados estudiará su caso y le responderá
+          personalmente.
         </p>
       </div>
       <div class="lg:col-span-4 lg:flex lg:justify-end">
@@ -83,26 +83,39 @@ const enlaceClase =
               aria-hidden="true"
             />
             <span>
-              {negocio.direccion.calle}<br />
               {
-                `${negocio.direccion.codigoPostal} ${negocio.direccion.ciudad}, ${negocio.direccion.region}`
+                negocio.direccion.calle && (
+                  <>
+                    {negocio.direccion.calle}
+                    <br />
+                  </>
+                )
               }
+              {`${negocio.direccion.ciudad}, ${negocio.direccion.region}`}
             </span>
           </li>
           <li class="flex items-center gap-3">
             <Icon name="lucide:phone" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
             <a href={`tel:${negocio.telefonoWhatsapp}`} class={enlaceClase}
-              >{negocio.telefonoWhatsapp}</a
+              >{formatearTelefono(negocio.telefonoWhatsapp)}</a
             >
           </li>
           <li class="flex items-center gap-3">
             <Icon name="lucide:mail" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
             <a href={`mailto:${negocio.email}`} class={enlaceClase}>{negocio.email}</a>
           </li>
-          <li class="flex items-center gap-3">
-            <Icon name="lucide:clock" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
-            {negocio.horario.map((h) => `${h.dias}: ${h.horas}`).join(' · ')}
-          </li>
+          {
+            negocio.horario.length > 0 && (
+              <li class="flex items-center gap-3">
+                <Icon
+                  name="lucide:clock"
+                  class="text-ink-gold h-4 w-4 shrink-0"
+                  aria-hidden="true"
+                />
+                {negocio.horario.map((h) => `${h.dias}: ${h.horas}`).join(' · ')}
+              </li>
+            )
+          }
         </ul>
       </div>
 
@@ -126,10 +139,11 @@ const enlaceClase =
 
     <div class="border-ink-border border-t py-8 text-xs leading-relaxed">
       <p class="max-w-4xl">
-        Aviso legal y política de privacidad: {negocio.nombreDespacho} trata los datos facilitados a través
-        de este sitio con la única finalidad de responder a su consulta, conforme al Reglamento (UE) 2016/679
-        (RGPD) y la Ley Orgánica 3/2018. No se cederán a terceros salvo obligación legal. Puede ejercer
-        sus derechos de acceso, rectificación y supresión escribiendo a {negocio.email}.
+        Tratamiento de datos personales: {negocio.nombreDespacho} trata los datos facilitados a través
+        de este sitio con la única finalidad de responder a su consulta, conforme a la Ley 1581 de 2012
+        y el Decreto 1377 de 2013. No se cederán a terceros salvo obligación legal. Puede ejercer sus
+        derechos a conocer, actualizar, rectificar y solicitar la supresión de sus datos escribiendo a
+        {negocio.email}.
       </p>
       <p class="mt-4">
         {`© ${anioActual} ${negocio.nombreDespacho}. Todos los derechos reservados.`}

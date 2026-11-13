@@ -1,11 +1,8 @@
 ---
 titulo: 'Derecho Penal'
-resumen: 'Defensa en procedimientos penales y asesoría ante denuncias o citaciones judiciales.'
-icono: 'shield-check'
-rangoHonorarios: 'Consulta inicial: 60€ — presupuesto según la fase del procedimiento'
+resumen: 'Defensa y asesoría en el proceso penal acusatorio, desde la etapa de investigación hasta el juicio.'
+icono: 'gavel'
 mensajeWhatsapp: 'Hola, quisiera una consulta sobre un asunto de Derecho Penal.'
-orden: 4
-destacado: false
+orden: 0
+destacado: true
 ---
-
-Defensa en procedimientos penales en todas sus fases, y asesoría inmediata ante una denuncia, citación judicial o detención.

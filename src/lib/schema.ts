@@ -20,7 +20,7 @@ export function generarLegalServiceSchema(socios: CollectionEntry<'socios'>[]) {
     priceRange: negocio.rangoHonorarios,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: negocio.direccion.calle,
+      ...(negocio.direccion.calle && { streetAddress: negocio.direccion.calle }),
       addressLocality: negocio.direccion.ciudad,
       addressRegion: negocio.direccion.region,
       postalCode: negocio.direccion.codigoPostal,

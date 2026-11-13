@@ -2,7 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { JSDOM } from 'jsdom';
 import Footer from '@/components/static/Footer.astro';
-import { negocio } from '@/lib/negocio';
+import { formatearTelefono, negocio } from '@/lib/negocio';
 
 describe('Footer', () => {
   let dom: JSDOM;
@@ -19,7 +19,7 @@ describe('Footer', () => {
 
   it('incluye los datos de contacto reales de negocio.ts (teléfono y email)', () => {
     const textoCompleto = dom.window.document.body.textContent ?? '';
-    expect(textoCompleto).toContain(negocio.telefonoWhatsapp);
+    expect(textoCompleto).toContain(formatearTelefono(negocio.telefonoWhatsapp));
     expect(textoCompleto).toContain(negocio.email);
   });
 

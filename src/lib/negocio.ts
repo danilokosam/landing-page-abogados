@@ -16,7 +16,7 @@ export interface DatosNegocio {
   telefonoWhatsapp: string; // formato E.164, ej. "+521234567890"
   email: string;
   direccion: {
-    calle: string;
+    calle?: string; // opcional — si se omite, solo se publica ciudad/región
     ciudad: string;
     region: string;
     codigoPostal: string;
@@ -28,24 +28,36 @@ export interface DatosNegocio {
   rangoHonorarios: string; // ej. "$$" — usado en priceRange de LegalService
 }
 
-// CONTENIDO FICTICIO PARA DESARROLLO (Fase 2) — despacho, dirección y
-// contactos son inventados pero verosímiles para el sector legal español.
-// TODO(fase 0): reemplazar con los datos reales provistos por los socios.
+// Datos reales del despacho (13 nov 2026), tomados de las hojas de vida
+// de los dos abogados. Deliberadamente NO se publica la dirección de
+// domicilio (solo ciudad, región y código postal) ni el horario de
+// atención (no se ha facilitado) — ver PROJECT_STATE.md.
+// PENDIENTE DE CONFIRMAR con el cliente: el nombre comercial del despacho.
 export const negocio: DatosNegocio = {
-  nombreDespacho: 'Duarte & Iglesias Abogados',
+  nombreDespacho: 'Duarte & Muñoz Abogados',
   descripcionCorta:
-    'Despacho de abogados en Madrid especializado en derecho civil, de familia, laboral y mercantil, con más de 20 años de experiencia combinada al servicio de particulares y empresas.',
-  telefonoWhatsapp: '+34612345678',
-  email: 'info@duarteiglesiasabogados.es',
+    'Despacho de abogados en Itagüí especializado en derecho penal y administrativo, con experiencia en litigio, docencia en Derecho Penal y más de dos décadas dentro del sistema penitenciario.',
+  telefonoWhatsapp: '+573124874581',
+  email: 'naty11_02@hotmail.com',
   direccion: {
-    calle: 'Calle de Alcalá, 123, 3º Izquierda',
-    ciudad: 'Madrid',
-    region: 'Comunidad de Madrid',
-    codigoPostal: '28009',
-    pais: 'ES',
+    ciudad: 'Itagüí',
+    region: 'Antioquia',
+    codigoPostal: '055413',
+    pais: 'CO',
   },
-  areaCobertura: ['Madrid capital', 'Comunidad de Madrid'],
-  horario: [{ dias: 'Lunes a Viernes', horas: '9:00 - 19:00' }],
+  areaCobertura: ['Itagüí', 'Antioquia'],
+  horario: [],
   redesSociales: [],
-  rangoHonorarios: '€€',
+  rangoHonorarios: '$$',
 };
+
+/**
+ * Formato legible de un número E.164 colombiano para mostrarlo en pantalla
+ * ("+573124874581" → "+57 312 487 4581"). Los enlaces (tel:, wa.me)
+ * siguen usando el valor E.164 sin espacios. Cualquier otro formato se
+ * devuelve tal cual.
+ */
+export function formatearTelefono(e164: string): string {
+  const m = /^\+57(\d{3})(\d{3})(\d{4})$/.exec(e164);
+  return m ? `+57 ${m[1]} ${m[2]} ${m[3]}` : e164;
+}

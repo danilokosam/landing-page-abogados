@@ -10,7 +10,9 @@ formacion:
 especialidades:
   - 'Área de práctica 1'
   - 'Área de práctica 2'
-acreditaciones:
+experiencia:
+  - 'Cargo — Entidad (Año – Año)'
+acreditaciones: # opcional — si se omite, el bloque no se muestra
   - 'Colegiatura / certificación'
 numeroWhatsapp: '' # opcional — si se omite, se usa el número de negocio.ts
 orden: 0

@@ -17,11 +17,19 @@ interface CifraClave {
   etiqueta: string;
 }
 
+// Todas las cifras salen de las hojas de vida (src/content/socios):
+//   - ejercicio: ambos se graduaron como abogados en 2017 — se calcula en
+//     build time para que no se quede desactualizada con los años.
+//   - INPEC: Fredy fue Inspector del 05/02/1999 al 23/09/2022 (23 años).
+//   - especializaciones: Natalia 2 (Penal, Administrativo), Fredy 1.
+const ANIO_GRADUACION = 2017;
+const aniosEjercicio = new Date().getFullYear() - ANIO_GRADUACION;
+
 const cifras: CifraClave[] = [
-  { valor: 2, sufijo: '', etiqueta: 'Socios fundadores, dedicación directa en cada caso' },
-  { valor: 20, sufijo: '+', etiqueta: 'Años de experiencia combinada' },
-  { valor: 6, sufijo: '', etiqueta: 'Áreas de práctica cubiertas' },
-  { valor: 24, sufijo: 'h', etiqueta: 'Tiempo de respuesta habitual por WhatsApp' },
+  { valor: 2, sufijo: '', etiqueta: 'Abogados, atención directa en cada caso' },
+  { valor: aniosEjercicio, sufijo: '', etiqueta: 'Años de ejercicio profesional' },
+  { valor: 23, sufijo: '', etiqueta: 'Años de experiencia en el sistema penitenciario (INPEC)' },
+  { valor: 3, sufijo: '', etiqueta: 'Especializaciones de posgrado' },
 ];
 ---
 
