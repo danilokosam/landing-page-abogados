@@ -7,12 +7,11 @@
  * Solo se cargan los pesos realmente usados por los componentes.
  */
 @import '@fontsource/playfair-display/500.css';
+@import '@fontsource/playfair-display/500-italic.css';
 @import '@fontsource/playfair-display/600.css';
-@import '@fontsource/playfair-display/700.css';
 @import '@fontsource/plus-jakarta-sans/400.css';
 @import '@fontsource/plus-jakarta-sans/500.css';
 @import '@fontsource/plus-jakarta-sans/600.css';
-@import '@fontsource/plus-jakarta-sans/700.css';
 
 /*
  * Modo oscuro por clase (no por media query) para las utilidades `dark:`
@@ -27,74 +26,72 @@
  * Toda la identidad visual del sitio se cambia editando los valores
  * de esta sección; los componentes solo consumen clases semánticas de
  * Tailwind (bg-background, text-foreground, bg-primary, border-border,
- * text-muted-foreground, bg-whatsapp...), nunca colores hardcodeados
- * (bg-slate-100, text-amber-800, etc.).
+ * text-muted-foreground, bg-ink...), nunca colores hardcodeados.
  *
- * Paleta clara: hueso cálido + navy corporativo + bronce/cognac apagado
- * como acento de prestigio. Paleta oscura: pizarra profunda (no negro
- * puro) + el mismo navy aclarado para mantener contraste en botones.
- * Todos los pares texto/fondo están verificados en AA (4.5:1) o mejor;
- * la mayoría supera AAA (7:1).
+ * Dirección de arte (rediseño "premium"): marfil cálido + tinta navy
+ * casi negra + oro viejo como acento. El oro se reserva para detalles
+ * (eyebrows, hairlines, cifras, cursivas del titular) — nunca grandes
+ * superficies. En oscuro el primario pasa a champán para que los botones
+ * sigan siendo el elemento de mayor contraste de la pantalla.
+ * Contraste verificado (fórmula WCAG): peor caso texto/fondo 5.11:1.
  */
 
 :root {
-  --background: #faf7f1; /* hueso cálido, no blanco puro */
-  --foreground: #1b2433; /* navy-carbón, no negro puro */
+  --background: #f7f4ee; /* marfil */
+  --foreground: #14171e; /* tinta */
 
-  --card: #ffffff; /* superficie de tarjetas, más clara que el fondo para dar profundidad */
-  --card-foreground: #1b2433;
+  --card: #ffffff;
+  --card-foreground: #14171e;
 
-  --primary: #1b2a4a; /* navy corporativo — autoridad, seriedad */
-  --primary-foreground: #f8f5ee;
+  --primary: #111a2c; /* tinta navy — botones principales */
+  --primary-foreground: #f5efe3;
 
-  --accent: #7c5a34; /* bronce/cognac apagado — insignias y detalles de prestigio */
+  --accent: #7a5c32; /* oro viejo — texto de acento (AA sobre marfil/muted) */
   --accent-foreground: #ffffff;
+  --gold: #b8955c; /* oro decorativo — solo líneas y adornos, nunca texto */
 
-  --muted: #f1ece1; /* superficie para secciones alternas */
-  --muted-foreground: #5b6472; /* texto secundario/de apoyo */
+  --muted: #efe9de;
+  --muted-foreground: #5a5f69;
 
-  --border: #d8cfb8; /* hairline cálido y sutil */
-  --ring: var(--primary); /* foco de teclado */
+  --border: #e0d8c8;
+  --ring: #7a5c32;
 
-  /* Verde funcional para el canal de conversión (WhatsApp): reconocible
-	   a propósito, deliberadamente separado del acento decorativo. */
+  /* Verde funcional de WhatsApp — se conserva como token, pero ya no tiñe
+     los CTA principales: el icono basta para reconocer el canal y el
+     verde saturado restaba sobriedad a la marca. */
   --whatsapp: #167c45;
   --whatsapp-foreground: #ffffff;
 }
 
 /*
- * Banda del Footer — deliberadamente invariante entre tema claro y
- * oscuro (siempre navy oscuro con texto claro), como ancla visual fija
- * de la marca. No se sobrescribe en los bloques de modo oscuro de abajo.
+ * Banda de tinta — invariante entre tema claro y oscuro. La usan la
+ * banda de cifras y el Footer como anclas de marca (siempre oscuras,
+ * como el lomo de un libro). No se sobrescribe en modo oscuro.
  */
 :root {
-  --footer-background: #1b2433;
-  --footer-foreground: #f8f5ee;
-  --footer-muted-foreground: #b7bec9;
-  --footer-border: #2a3550;
+  --ink: #0e1422;
+  --ink-foreground: #f3ede1;
+  --ink-muted-foreground: #a9b0bc;
+  --ink-border: #232b3d;
+  --ink-gold: #cfae76;
 }
 
 /* Modo oscuro automático (preferencia del sistema), salvo que .light lo fuerce */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: #12151b;
-    --foreground: #ece7da;
-
-    --card: #1a1f28;
-    --card-foreground: #ece7da;
-
-    --primary: #7b92b8;
-    --primary-foreground: #10141c;
-
-    --accent: #c89b5c;
-    --accent-foreground: #14181f;
-
-    --muted: #1e232c;
-    --muted-foreground: #9ba3af;
-
-    --border: #2b323d;
-    --ring: var(--primary);
-
+    --background: #0c0e13;
+    --foreground: #ece6d8;
+    --card: #14171e;
+    --card-foreground: #ece6d8;
+    --primary: #d4b884;
+    --primary-foreground: #15120c;
+    --accent: #cfae76;
+    --accent-foreground: #15120c;
+    --gold: #a88a58;
+    --muted: #171b23;
+    --muted-foreground: #9da3ad;
+    --border: #262b35;
+    --ring: #cfae76;
     --whatsapp: #22a360;
     --whatsapp-foreground: #0c2016;
   }
@@ -102,24 +99,19 @@
 
 /* Modo oscuro forzado explícitamente — vía la clase que aplica ThemeToggle.astro */
 .dark {
-  --background: #12151b;
-  --foreground: #ece7da;
-
-  --card: #1a1f28;
-  --card-foreground: #ece7da;
-
-  --primary: #7b92b8;
-  --primary-foreground: #10141c;
-
-  --accent: #c89b5c;
-  --accent-foreground: #14181f;
-
-  --muted: #1e232c;
-  --muted-foreground: #9ba3af;
-
-  --border: #2b323d;
-  --ring: var(--primary);
-
+  --background: #0c0e13;
+  --foreground: #ece6d8;
+  --card: #14171e;
+  --card-foreground: #ece6d8;
+  --primary: #d4b884;
+  --primary-foreground: #15120c;
+  --accent: #cfae76;
+  --accent-foreground: #15120c;
+  --gold: #a88a58;
+  --muted: #171b23;
+  --muted-foreground: #9da3ad;
+  --border: #262b35;
+  --ring: #cfae76;
   --whatsapp: #22a360;
   --whatsapp-foreground: #0c2016;
 }
@@ -147,10 +139,13 @@
   --color-whatsapp: var(--whatsapp);
   --color-whatsapp-foreground: var(--whatsapp-foreground);
 
-  --color-footer: var(--footer-background);
-  --color-footer-foreground: var(--footer-foreground);
-  --color-footer-muted-foreground: var(--footer-muted-foreground);
-  --color-footer-border: var(--footer-border);
+  --color-gold: var(--gold);
+
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-muted-foreground: var(--ink-muted-foreground);
+  --color-ink-border: var(--ink-border);
+  --color-ink-gold: var(--ink-gold);
 
   --font-serif: 'Playfair Display', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-sans:
@@ -162,6 +157,65 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--gold) 35%, transparent);
+  color: var(--foreground);
+}
+
+/*
+ * Fondo ambiental — luces difusas con radial-gradient en vez de bloques
+ * con filter: blur(): mismo resultado visual, pero sin el coste de
+ * rasterizar un filtro de desenfoque enorme en cada composición (notable
+ * en móviles de gama media). Se adapta solo entre temas vía las variables.
+ */
+#fondo-ambiental {
+  background:
+    radial-gradient(
+      60rem 40rem at 85% -10%,
+      color-mix(in srgb, var(--gold) 14%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50rem 36rem at -10% 30%,
+      color-mix(in srgb, var(--primary) 7%, transparent),
+      transparent 70%
+    );
+}
+.dark #fondo-ambiental {
+  background:
+    radial-gradient(
+      60rem 40rem at 85% -10%,
+      color-mix(in srgb, var(--gold) 16%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50rem 36rem at -10% 40%,
+      color-mix(in srgb, #2b3a5c 45%, transparent),
+      transparent 70%
+    );
+}
+
+/* Eyebrow editorial: texto en versalitas precedido de una hairline dorada */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow::before {
+  content: '';
+  width: 2rem;
+  height: 1px;
+  background: var(--gold);
 }
 
 /*
@@ -209,12 +263,12 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    var(--border) 12%,
-    var(--accent) 50%,
-    var(--border) 88%,
+    var(--border) 15%,
+    var(--gold) 50%,
+    var(--border) 85%,
     transparent
   );
-  box-shadow: 0 1px 8px -1px color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 1px 10px -2px color-mix(in srgb, var(--gold) 40%, transparent);
 }
 
 /* Scroll suave para los anclajes de navegación (#sobre-nosotros, etc.) */
@@ -229,36 +283,62 @@ html {
 }
 
 /*
- * Estado inicial de la entrada del Hero (Propuesta 02 — "revelado con
- * línea de firma"), consumida por inicializarEntradaHero() en
- * src/lib/gsap/animations.ts. Solo se oculta cuando SE CUMPLEN LAS DOS
- * condiciones a la vez:
- *   1. html:not(.no-js) — JS confirmó (BaseLayout.astro, script
- *      bloqueante) que va a tomar control antes del primer pintado.
- *      Sin JS, "no-js" nunca se quita y el contenido queda visible.
- *   2. prefers-reduced-motion: no-preference — si el usuario pidió
- *      menos movimiento, esta regla no aplica en absoluto: el Hero se
- *      pinta ya en su estado final, sin ocultarse nunca (evita dejar
- *      contenido invisible si la animación no llega a correr).
- * GSAP solo anima HACIA el estado visible (gsap.to), nunca declara el
- * "from" — así este bloque sigue siendo la única fuente de verdad del
- * estado inicial, sin duplicar valores entre CSS y JS.
+ * Entrada del Hero — 100% CSS (antes GSAP). Al no depender de que el
+ * bundle de JS se descargue y ejecute, el titular (elemento LCP) empieza
+ * a revelarse en el primer pintado. Con prefers-reduced-motion: reduce no
+ * se declara ninguna animación: el Hero se pinta directamente en su
+ * estado final.
  */
-@media (prefers-reduced-motion: no-preference) {
-  html:not(.no-js) [data-hero-anim='eyebrow'],
-  html:not(.no-js) [data-hero-anim='lead'] {
+@keyframes hero-in {
+  from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
   }
-  html:not(.no-js) [data-hero-anim='cta'] {
-    opacity: 0;
-    transform: translateY(10px) scale(0.97);
-  }
-  html:not(.no-js) [data-hero-anim='line'] {
+}
+@keyframes hero-line {
+  from {
     transform: scaleX(0);
   }
-  html:not(.no-js) [data-hero-anim='title'] {
-    clip-path: inset(0% 0% 100% 0%);
+}
+@keyframes hero-title {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-hero-anim] {
+    animation: hero-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  [data-hero-anim='eyebrow'] {
+    animation-delay: 0.05s;
+  }
+  [data-hero-anim='line'] {
+    transform-origin: left;
+    animation: hero-line 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+  }
+  [data-hero-anim='title'] {
+    animation: hero-title 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards;
+  }
+  [data-hero-anim='lead'] {
+    animation-delay: 0.35s;
+  }
+  [data-hero-anim='cta'] {
+    animation-delay: 0.5s;
+  }
+  [data-hero-anim='cta'] + [data-hero-anim='cta'] {
+    animation-delay: 0.58s;
+  }
+  [data-hero-anim='trust'] {
+    animation-delay: 0.7s;
+  }
+  [data-hero-anim='aside'] {
+    animation: hero-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s backwards;
   }
 
   /*
@@ -276,11 +356,11 @@ html {
    */
   html:not(.no-js) [data-reveal='left'] {
     opacity: 0;
-    transform: translateX(-40px);
+    transform: translateX(-24px);
   }
   html:not(.no-js) [data-reveal='right'] {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(24px);
   }
   html:not(.no-js) [data-reveal='up'] {
     opacity: 0;
@@ -288,6 +368,6 @@ html {
   }
   html:not(.no-js) [data-reveal-grid] > * {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(28px);
   }
 }

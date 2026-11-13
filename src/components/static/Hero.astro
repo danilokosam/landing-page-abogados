@@ -1,49 +1,150 @@
 ---
+/**
+ * Hero editorial a dos columnas. La entrada animada es CSS puro
+ * (global.css, [data-hero-anim]) — no espera a GSAP, así que el titular
+ * (elemento LCP) se pinta y revela desde el primer fotograma.
+ */
 import { Icon } from 'astro-icon/components';
 import { negocio } from '@/lib/negocio';
 import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
 
 const enlaceWhatsApp = construirEnlaceWhatsApp('Hola, quisiera agendar una consulta.');
+
+const garantias = ['Colegiados en el ICAM', 'Presupuesto cerrado', 'Trato directo con un socio'];
+
+const pasos = [
+  {
+    titulo: 'Nos cuenta su caso',
+    texto: 'Por WhatsApp, con total confidencialidad.',
+  },
+  {
+    titulo: 'Lo estudia un socio',
+    texto: 'Respuesta habitual en menos de 24 horas.',
+  },
+  {
+    titulo: 'Propuesta clara',
+    texto: 'Estrategia y honorarios por escrito, antes de empezar.',
+  },
+];
 ---
 
-<section class="bg-background/95">
-  <div class="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-    <p data-hero-anim="eyebrow" class="text-accent text-sm font-semibold tracking-widest uppercase">
-      Abogados en Madrid
-    </p>
-    <span
-      data-hero-anim="line"
-      aria-hidden="true"
-      class="bg-accent mt-3 mb-5 block h-px w-16 origin-left"></span>
-    <h1
-      data-hero-anim="title"
-      class="text-foreground font-serif text-4xl leading-tight font-semibold text-balance sm:text-5xl"
-    >
-      Asesoramiento jurídico claro, en el momento en que lo necesita
-    </h1>
-    <p data-hero-anim="lead" class="text-muted-foreground mt-6 max-w-xl text-lg leading-relaxed">
-      {negocio.descripcionCorta}
-    </p>
+<section class="relative overflow-hidden">
+  <div
+    class="mx-auto grid max-w-7xl items-center gap-14 px-5 pt-16 pb-20 sm:px-8 lg:grid-cols-12 lg:gap-10 lg:px-10 lg:pt-24 lg:pb-28"
+  >
+    <div class="lg:col-span-7">
+      <p data-hero-anim="eyebrow" class="eyebrow">
+        Abogados en {negocio.direccion.ciudad}
+      </p>
+      <span
+        data-hero-anim="line"
+        aria-hidden="true"
+        class="bg-border mt-6 mb-7 block h-px w-full max-w-md origin-left"></span>
+      <h1
+        data-hero-anim="title"
+        class="text-foreground font-serif text-[2.6rem] leading-[1.06] font-medium tracking-[-0.015em] text-balance sm:text-6xl lg:text-[4.4rem]"
+      >
+        Asesoramiento jurídico <em class="text-accent font-medium">claro</em>, en el momento en que
+        lo necesita
+      </h1>
+      <p
+        data-hero-anim="lead"
+        class="text-muted-foreground mt-7 max-w-xl text-base leading-relaxed sm:text-lg"
+      >
+        {negocio.descripcionCorta}
+      </p>
 
-    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-      <a
-        data-hero-anim="cta"
-        href={enlaceWhatsApp}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 focus-visible:outline-whatsapp inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+      <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <a
+          data-hero-anim="cta"
+          href={enlaceWhatsApp}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group bg-primary text-primary-foreground focus-visible:outline-ring shadow-primary/20 inline-flex items-center justify-center gap-2.5 rounded-full px-7 py-4 text-[0.9375rem] font-semibold tracking-wide shadow-lg transition-[opacity,transform] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98]"
+        >
+          <Icon name="lucide:message-circle" class="h-[18px] w-[18px]" aria-hidden="true" />
+          Agendar una consulta
+          <Icon
+            name="lucide:arrow-up-right"
+            class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            aria-hidden="true"
+          />
+        </a>
+        <a
+          data-hero-anim="cta"
+          href="#servicios"
+          class="group text-foreground border-border hover:border-foreground/40 focus-visible:outline-ring inline-flex items-center justify-center gap-2 rounded-full border px-7 py-4 text-[0.9375rem] font-semibold tracking-wide transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Ver áreas de práctica
+          <Icon
+            name="lucide:arrow-right"
+            class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </a>
+      </div>
+
+      <ul
+        data-hero-anim="trust"
+        class="text-muted-foreground mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm"
       >
-        <Icon name="lucide:message-circle" class="h-5 w-5" aria-hidden="true" />
-        Agendar una consulta por WhatsApp
-      </a>
-      <a
-        data-hero-anim="cta"
-        href="#servicios"
-        class="border-border text-foreground hover:border-primary hover:bg-card focus-visible:outline-ring inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3.5 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
-      >
-        Ver áreas de práctica
-        <Icon name="lucide:arrow-right" class="h-4 w-4" aria-hidden="true" />
-      </a>
+        {
+          garantias.map((garantia) => (
+            <li class="flex items-center gap-2">
+              <Icon name="lucide:check" class="text-accent h-4 w-4" aria-hidden="true" />
+              {garantia}
+            </li>
+          ))
+        }
+      </ul>
     </div>
+
+    <aside
+      data-hero-anim="aside"
+      aria-labelledby="como-empezamos"
+      class="relative lg:col-span-5 lg:pl-6"
+    >
+      <!-- Marco doble: borde exterior + hairline dorada interior, gesto clásico de papelería legal -->
+      <div
+        class="border-border bg-card/80 relative border p-2 shadow-2xl shadow-black/[0.06] backdrop-blur-sm"
+      >
+        <div class="border-gold/40 border px-7 py-9 sm:px-9 sm:py-11">
+          <p class="eyebrow">Cómo empezamos</p>
+          <h2
+            id="como-empezamos"
+            class="text-foreground mt-4 font-serif text-2xl leading-snug font-medium sm:text-[1.75rem]"
+          >
+            Tres pasos, sin compromiso y sin letra pequeña.
+          </h2>
+
+          <ol class="mt-8 mb-6 space-y-6">
+            {
+              pasos.map((paso, i) => (
+                <li class="group/paso flex gap-5">
+                  <span class="text-accent w-5 shrink-0 font-serif text-sm leading-6 font-semibold tabular-nums">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div class="border-border flex-1 border-b pb-6 group-last/paso:border-0 group-last/paso:pb-0">
+                    <p class="text-foreground text-[0.9375rem] font-semibold">{paso.titulo}</p>
+                    <p class="text-muted-foreground mt-1 text-sm leading-relaxed">{paso.texto}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+
+          <p
+            class="border-border text-muted-foreground flex items-start gap-3 border-t pt-6 text-sm leading-relaxed"
+          >
+            <Icon
+              name="lucide:lock-keyhole"
+              class="text-accent mt-0.5 h-4 w-4 shrink-0"
+              aria-hidden="true"
+            />
+            Todo lo que nos cuente está protegido por el secreto profesional.
+          </p>
+        </div>
+      </div>
+    </aside>
   </div>
 </section>

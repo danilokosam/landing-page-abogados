@@ -1,4 +1,10 @@
 ---
+/**
+ * Footer en banda de "tinta" (invariante entre temas). Abre con la
+ * llamada a la acción final de la página — el último punto de decisión
+ * del visitante — y vive dentro de <footer id="contacto"> para que el
+ * enlace "Contacto" del menú aterrice directamente en ella.
+ */
 import { Icon } from 'astro-icon/components';
 import { negocio } from '@/lib/negocio';
 import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
@@ -10,70 +16,105 @@ const enlaces = [
   { href: '#sobre-nosotros', texto: 'Sobre Nosotros' },
   { href: '#servicios', texto: 'Servicios' },
 ];
+
+const enlaceClase =
+  'hover:text-ink-foreground focus-visible:outline-ink-gold transition-colors focus-visible:outline-2 focus-visible:outline-offset-4';
 ---
 
-<footer id="contacto" class="bg-footer text-footer-muted-foreground scroll-mt-20">
-  <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-    <div class="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
-      <div>
-        <p class="text-footer-foreground font-serif text-lg font-semibold">
-          {negocio.nombreDespacho}
+<footer id="contacto" class="bg-ink text-ink-muted-foreground scroll-mt-20">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+    {/* Llamada a la acción final */}
+    <div
+      class="border-ink-border grid gap-10 border-b py-20 lg:grid-cols-12 lg:items-end lg:gap-10 lg:py-28"
+    >
+      <div class="lg:col-span-8">
+        <p
+          class="text-ink-gold before:bg-ink-gold flex items-center gap-3.5 text-xs font-semibold tracking-[0.22em] uppercase before:h-px before:w-8 before:content-['']"
+        >
+          Primer paso
         </p>
-        <p class="mt-3 max-w-sm text-sm leading-relaxed">
-          {negocio.descripcionCorta}
+        <h2
+          class="text-ink-foreground mt-6 font-serif text-4xl leading-[1.08] font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl"
+        >
+          ¿Hablamos de su caso? <em class="text-ink-gold font-medium">Sin compromiso.</em>
+        </h2>
+        <p class="mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
+          Escríbanos por WhatsApp y un socio le responderá personalmente, normalmente en menos de 24
+          horas laborables.
         </p>
+      </div>
+      <div class="lg:col-span-4 lg:flex lg:justify-end">
         <a
           href={enlaceWhatsApp}
           target="_blank"
           rel="noopener noreferrer"
-          class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 focus-visible:outline-whatsapp mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+          class="group bg-ink-gold text-ink focus-visible:outline-ink-gold inline-flex w-full items-center justify-center gap-2.5 rounded-full px-8 py-4 text-[0.9375rem] font-semibold tracking-wide transition-[opacity,transform] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 active:scale-[0.98] sm:w-auto"
         >
-          <Icon name="lucide:message-circle" class="h-4 w-4" aria-hidden="true" />
+          <Icon name="lucide:message-circle" class="h-[18px] w-[18px]" aria-hidden="true" />
           Escribir por WhatsApp
+          <Icon
+            name="lucide:arrow-up-right"
+            class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            aria-hidden="true"
+          />
         </a>
+      </div>
+    </div>
+
+    <div class="grid gap-12 py-16 md:grid-cols-[1.3fr_1fr_0.7fr]">
+      <div>
+        <p class="text-ink-foreground font-serif text-xl font-medium">
+          {negocio.nombreDespacho}
+        </p>
+        <p class="mt-4 max-w-sm text-sm leading-relaxed">
+          {negocio.descripcionCorta}
+        </p>
       </div>
 
       <div>
-        <h3 class="text-footer-foreground text-sm font-semibold tracking-wide uppercase">
+        <h3 class="text-ink-foreground text-xs font-semibold tracking-[0.18em] uppercase">
           Contacto
         </h3>
-        <ul class="mt-4 space-y-3 text-sm">
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:map-pin" class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+        <ul class="mt-5 space-y-3.5 text-sm">
+          <li class="flex items-start gap-3">
+            <Icon
+              name="lucide:map-pin"
+              class="text-ink-gold mt-0.5 h-4 w-4 shrink-0"
+              aria-hidden="true"
+            />
             <span>
               {negocio.direccion.calle}<br />
-              {negocio.direccion.ciudad}, {negocio.direccion.region}
-              {negocio.direccion.codigoPostal}
+              {
+                `${negocio.direccion.codigoPostal} ${negocio.direccion.ciudad}, ${negocio.direccion.region}`
+              }
             </span>
           </li>
-          <li class="flex items-center gap-2">
-            <Icon name="lucide:phone" class="h-4 w-4 shrink-0" aria-hidden="true" />
-            <a href={`tel:${negocio.telefonoWhatsapp}`} class="hover:text-footer-foreground"
+          <li class="flex items-center gap-3">
+            <Icon name="lucide:phone" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
+            <a href={`tel:${negocio.telefonoWhatsapp}`} class={enlaceClase}
               >{negocio.telefonoWhatsapp}</a
             >
           </li>
-          <li class="flex items-center gap-2">
-            <Icon name="lucide:mail" class="h-4 w-4 shrink-0" aria-hidden="true" />
-            <a href={`mailto:${negocio.email}`} class="hover:text-footer-foreground"
-              >{negocio.email}</a
-            >
+          <li class="flex items-center gap-3">
+            <Icon name="lucide:mail" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
+            <a href={`mailto:${negocio.email}`} class={enlaceClase}>{negocio.email}</a>
           </li>
-          <li class="flex items-center gap-2">
-            <Icon name="lucide:clock" class="h-4 w-4 shrink-0" aria-hidden="true" />
+          <li class="flex items-center gap-3">
+            <Icon name="lucide:clock" class="text-ink-gold h-4 w-4 shrink-0" aria-hidden="true" />
             {negocio.horario.map((h) => `${h.dias}: ${h.horas}`).join(' · ')}
           </li>
         </ul>
       </div>
 
       <div>
-        <h3 class="text-footer-foreground text-sm font-semibold tracking-wide uppercase">
+        <h3 class="text-ink-foreground text-xs font-semibold tracking-[0.18em] uppercase">
           Accesos
         </h3>
-        <ul class="mt-4 space-y-3 text-sm">
+        <ul class="mt-5 space-y-3.5 text-sm">
           {
             enlaces.map((enlace) => (
               <li>
-                <a href={enlace.href} class="hover:text-footer-foreground">
+                <a href={enlace.href} class={enlaceClase}>
                   {enlace.texto}
                 </a>
               </li>
@@ -83,16 +124,15 @@ const enlaces = [
       </div>
     </div>
 
-    <div class="border-footer-border mt-14 border-t pt-8 text-xs leading-relaxed">
-      <p>
+    <div class="border-ink-border border-t py-8 text-xs leading-relaxed">
+      <p class="max-w-4xl">
         Aviso legal y política de privacidad: {negocio.nombreDespacho} trata los datos facilitados a través
         de este sitio con la única finalidad de responder a su consulta, conforme al Reglamento (UE) 2016/679
         (RGPD) y la Ley Orgánica 3/2018. No se cederán a terceros salvo obligación legal. Puede ejercer
         sus derechos de acceso, rectificación y supresión escribiendo a {negocio.email}.
       </p>
-      <p class="mt-3">
-        © {anioActual}
-        {negocio.nombreDespacho}. Todos los derechos reservados.
+      <p class="mt-4">
+        {`© ${anioActual} ${negocio.nombreDespacho}. Todos los derechos reservados.`}
       </p>
     </div>
   </div>

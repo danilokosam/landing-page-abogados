@@ -9,82 +9,105 @@ const sociosConContenido = await Promise.all(
 );
 ---
 
-<section id="sobre-nosotros" class="border-border bg-background/95 scroll-mt-20 border-b">
-  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-    <div class="max-w-2xl" data-reveal="left">
-      <p class="text-accent text-sm font-semibold tracking-widest uppercase">Trayectoria</p>
-      <h2 class="text-foreground mt-3 font-serif text-3xl font-semibold text-balance sm:text-4xl">
-        Sobre nosotros
-      </h2>
-      <p class="text-muted-foreground mt-4 text-lg leading-relaxed">
-        Un despacho de dos socios que combina más de dos décadas de práctica jurídica en Madrid, con
-        un trato directo y personal en cada caso.
-      </p>
+<section id="sobre-nosotros" class="scroll-mt-20">
+  <div
+    class="mx-auto grid max-w-7xl gap-14 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:gap-10 lg:px-10 lg:py-32"
+  >
+    <div class="lg:col-span-4" data-reveal="left">
+      <div>
+        <p class="eyebrow">Trayectoria</p>
+        <h2
+          class="text-foreground mt-5 font-serif text-4xl leading-[1.1] font-medium tracking-tight text-balance sm:text-5xl"
+        >
+          Sobre nosotros
+        </h2>
+        <p class="text-muted-foreground mt-6 text-base leading-relaxed sm:text-lg">
+          Un despacho de dos socios que combina más de dos décadas de práctica jurídica en Madrid,
+          con un trato directo y personal en cada caso.
+        </p>
+
+        <figure class="border-gold mt-10 border-l pl-6">
+          <blockquote
+            class="text-foreground font-serif text-xl leading-snug font-medium italic sm:text-2xl"
+          >
+            «Su asunto nunca pasa a un tercero: lo lleva de principio a fin uno de los socios.»
+          </blockquote>
+          <figcaption
+            class="text-muted-foreground mt-4 text-xs font-semibold tracking-[0.18em] uppercase"
+          >
+            Nuestro compromiso
+          </figcaption>
+        </figure>
+      </div>
     </div>
 
-    <div class="mt-14 grid gap-10 md:grid-cols-2 md:gap-8" data-reveal="right">
+    <div class="space-y-8 lg:col-span-8" data-reveal="right">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article class="border-border bg-card hover:border-primary/30 flex flex-col gap-7 rounded-2xl border p-7 transition-colors duration-300 sm:flex-row sm:items-start sm:gap-8 sm:p-9">
-            <Image
-              src={socio.data.foto}
-              alt={`Retrato de ${socio.data.nombre}`}
-              width={112}
-              height={112}
-              class="ring-border h-28 w-28 shrink-0 rounded-full object-cover ring-1"
-            />
-            <div class="min-w-0 flex-1">
-              <h3 class="text-foreground font-serif text-xl font-semibold sm:text-2xl">
-                {socio.data.nombre}
-              </h3>
-              <p class="text-accent mt-1 text-sm font-medium">{socio.data.cargo}</p>
+          <article class="border-border bg-card hover:border-gold/60 relative border p-7 transition-colors duration-500 sm:p-10">
+            <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-7">
+              <Image
+                src={socio.data.foto}
+                alt={`Retrato de ${socio.data.nombre}`}
+                width={96}
+                height={96}
+                loading="lazy"
+                class="ring-gold/50 ring-offset-card h-24 w-24 shrink-0 rounded-full object-cover ring-1 ring-offset-4"
+              />
+              <div>
+                <h3 class="text-foreground font-serif text-2xl font-medium sm:text-[1.75rem]">
+                  {socio.data.nombre}
+                </h3>
+                <p class="text-accent mt-1.5 text-xs font-semibold tracking-[0.18em] uppercase">
+                  {socio.data.cargo}
+                </p>
+              </div>
+            </div>
 
-              <div class="prose-p:my-3 text-muted-foreground mt-4 text-sm leading-relaxed">
-                <Content />
+            <div class="text-muted-foreground mt-7 space-y-3 text-[0.9375rem] leading-relaxed">
+              <Content />
+            </div>
+
+            <dl class="border-border mt-8 grid gap-6 border-t pt-7 text-sm sm:grid-cols-2">
+              <div>
+                <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
+                  <Icon
+                    name="lucide:graduation-cap"
+                    class="text-accent h-4 w-4"
+                    aria-hidden="true"
+                  />
+                  Formación
+                </dt>
+                <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
+                  {socio.data.formacion.map((item) => (
+                    <p>{item}</p>
+                  ))}
+                </dd>
               </div>
 
-              <dl class="mt-6 space-y-4 text-sm">
-                <div>
-                  <dt class="text-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
-                    <Icon
-                      name="lucide:graduation-cap"
-                      class="text-muted-foreground h-3.5 w-3.5"
-                      aria-hidden="true"
-                    />
-                    Formación
-                  </dt>
-                  <dd class="text-muted-foreground mt-1.5 space-y-1">
-                    {socio.data.formacion.map((item) => (
-                      <p>{item}</p>
-                    ))}
-                  </dd>
-                </div>
+              <div>
+                <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
+                  <Icon name="lucide:award" class="text-accent h-4 w-4" aria-hidden="true" />
+                  Acreditaciones
+                </dt>
+                <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
+                  {socio.data.acreditaciones.map((item) => (
+                    <p>{item}</p>
+                  ))}
+                </dd>
+              </div>
+            </dl>
 
-                <div>
-                  <dt class="text-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase">
-                    <Icon
-                      name="lucide:award"
-                      class="text-muted-foreground h-3.5 w-3.5"
-                      aria-hidden="true"
-                    />
-                    Acreditaciones
-                  </dt>
-                  <dd class="text-muted-foreground mt-1.5 space-y-1">
-                    {socio.data.acreditaciones.map((item) => (
-                      <p>{item}</p>
-                    ))}
-                  </dd>
-                </div>
-              </dl>
-
-              <ul class="mt-6 flex flex-wrap gap-2">
-                {socio.data.especialidades.map((especialidad) => (
-                  <li class="bg-accent/10 text-accent border-accent/20 rounded-full border px-3 py-1 text-xs font-medium">
-                    {especialidad}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul
+              class="mt-7 flex flex-wrap gap-2"
+              aria-label={`Especialidades de ${socio.data.nombre}`}
+            >
+              {socio.data.especialidades.map((especialidad) => (
+                <li class="border-border text-foreground/80 rounded-full border px-3.5 py-1 text-xs font-medium">
+                  {especialidad}
+                </li>
+              ))}
+            </ul>
           </article>
         ))
       }

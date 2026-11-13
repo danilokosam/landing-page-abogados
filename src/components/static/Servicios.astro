@@ -5,21 +5,25 @@ import TarjetaServicio from './TarjetaServicio.astro';
 const servicios = (await getCollection('servicios')).sort((a, b) => a.data.orden - b.data.orden);
 ---
 
-<section id="servicios" class="border-border bg-muted/95 scroll-mt-20 border-b">
-  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-    <div class="max-w-2xl" data-reveal="up">
-      <p class="text-accent text-sm font-semibold tracking-widest uppercase">Áreas de práctica</p>
-      <h2 class="text-foreground mt-3 font-serif text-3xl font-semibold text-balance sm:text-4xl">
-        Servicios y honorarios
-      </h2>
-      <p class="text-muted-foreground mt-4 text-lg leading-relaxed">
+<section id="servicios" class="border-border bg-muted/70 scroll-mt-20 border-y">
+  <div class="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10 lg:py-32">
+    <div class="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-10" data-reveal="up">
+      <div class="lg:col-span-7">
+        <p class="eyebrow">Áreas de práctica</p>
+        <h2
+          class="text-foreground mt-5 font-serif text-4xl leading-[1.1] font-medium tracking-tight text-balance sm:text-5xl"
+        >
+          Servicios y honorarios
+        </h2>
+      </div>
+      <p class="text-muted-foreground text-base leading-relaxed sm:text-lg lg:col-span-5">
         Cada área incluye una primera consulta a un precio cerrado, para que sepa desde el principio
         con qué está contando.
       </p>
     </div>
 
-    <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-reveal-grid>
-      {servicios.map((servicio) => <TarjetaServicio servicio={servicio} />)}
+    <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal-grid>
+      {servicios.map((servicio, i) => <TarjetaServicio servicio={servicio} indice={i + 1} />)}
     </div>
   </div>
 </section>

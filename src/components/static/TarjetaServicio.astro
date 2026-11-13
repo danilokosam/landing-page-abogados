@@ -5,34 +5,68 @@ import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
 
 interface Props {
   servicio: CollectionEntry<'servicios'>;
+  /** Posición en el listado (1-based), mostrada como "01", "02"... */
+  indice?: number;
 }
 
-const { servicio } = Astro.props;
+const { servicio, indice } = Astro.props;
 const { titulo, resumen, icono, rangoHonorarios, mensajeWhatsapp } = servicio.data;
 const enlaceWhatsApp = construirEnlaceWhatsApp(mensajeWhatsapp);
+
+// Hover en 150ms ease-out (ver tests/e2e/ui-fixes.spec.ts). El primer
+// <div> del <article> es el contenedor del icono: su fondo cambia en
+// hover — también lo verifica la suite e2e, no reordenar.
 ---
 
 <article
-  class="group border-border bg-card hover:border-primary/50 hover:shadow-primary/10 flex flex-col rounded-2xl border p-7 transition-all duration-150 ease-out hover:shadow-md motion-safe:hover:-translate-y-0.5"
+  class="group border-border bg-card hover:border-gold/70 relative flex flex-col overflow-hidden border p-8 transition-all duration-150 ease-out hover:shadow-xl hover:shadow-black/[0.06] motion-safe:hover:-translate-y-1"
 >
   <div
-    class="bg-muted text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground flex h-11 w-11 items-center justify-center rounded-full transition-colors duration-150 ease-out"
+    class="border-border text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary flex h-12 w-12 items-center justify-center rounded-full border transition-colors duration-150 ease-out"
   >
     <Icon name={`lucide:${icono}`} class="h-5 w-5" aria-hidden="true" />
   </div>
 
-  <h3 class="text-foreground mt-5 font-serif text-lg font-semibold">{titulo}</h3>
-  <p class="text-muted-foreground mt-2 flex-1 text-sm leading-relaxed">{resumen}</p>
-  <p class="text-muted-foreground mt-5 text-sm font-medium">{rangoHonorarios}</p>
+  {
+    indice !== undefined && (
+      <span
+        aria-hidden="true"
+        class="text-muted-foreground absolute top-8 right-8 font-serif text-sm tabular-nums"
+      >
+        {String(indice).padStart(2, '0')}
+      </span>
+    )
+  }
+
+  <h3 class="text-foreground mt-7 font-serif text-2xl font-medium">{titulo}</h3>
+  <p class="text-muted-foreground mt-3 flex-1 text-[0.9375rem] leading-relaxed">{resumen}</p>
+
+  <div class="border-border mt-7 border-t pt-5">
+    <p class="text-muted-foreground text-[0.6875rem] font-semibold tracking-[0.18em] uppercase">
+      Honorarios
+    </p>
+    <p class="text-foreground mt-1.5 text-sm leading-relaxed">{rangoHonorarios}</p>
+  </div>
 
   <a
     href={enlaceWhatsApp}
     target="_blank"
     rel="noopener noreferrer"
     aria-label={`Consultar por ${titulo} vía WhatsApp`}
-    class="text-whatsapp hover:text-whatsapp/80 focus-visible:outline-whatsapp mt-6 inline-flex items-center gap-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+    class="text-accent focus-visible:outline-ring mt-6 inline-flex items-center gap-2 self-start text-sm font-semibold tracking-wide transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
   >
-    <Icon name="lucide:message-circle" class="h-4 w-4" aria-hidden="true" />
-    Consultar por WhatsApp
+    <span class="decoration-gold/60 underline-offset-[6px] group-hover:underline">
+      Consultar este caso
+    </span>
+    <Icon
+      name="lucide:arrow-right"
+      class="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+      aria-hidden="true"
+    />
   </a>
+
+  <span
+    aria-hidden="true"
+    class="bg-gold absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-150 ease-out group-hover:scale-x-100"
+  ></span>
 </article>

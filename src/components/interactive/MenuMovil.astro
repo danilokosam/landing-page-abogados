@@ -73,17 +73,17 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
   </summary>
 
   <nav
-    class="bg-background fixed inset-x-0 top-0 z-40 flex h-dvh flex-col px-6 pt-24 pb-8"
+    class="bg-background fixed inset-x-0 top-0 z-40 flex h-dvh flex-col px-6 pt-24 pb-10"
     aria-label="Navegación principal (móvil)"
   >
-    <ul class="flex flex-col gap-1">
+    <ul class="flex flex-col">
       {
         enlaces.map((enlace) => (
           <li>
             <a
               href={enlace.href}
               data-menu-movil-enlace
-              class="text-foreground hover:bg-muted hover:text-accent block rounded-lg px-4 py-4 font-serif text-2xl font-medium transition-colors"
+              class="text-foreground hover:text-accent border-border block border-b py-5 font-serif text-3xl font-medium transition-colors"
             >
               {enlace.texto}
             </a>
@@ -97,10 +97,10 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
       target="_blank"
       rel="noopener noreferrer"
       data-menu-movil-enlace
-      class="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 mt-auto flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-semibold transition-colors"
+      class="bg-primary text-primary-foreground mt-auto flex items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-semibold tracking-wide transition-opacity hover:opacity-90"
     >
       <Icon name="lucide:message-circle" class="h-5 w-5" aria-hidden="true" />
-      Contactar por WhatsApp
+      Agendar consulta por WhatsApp
     </a>
   </nav>
 </details>
