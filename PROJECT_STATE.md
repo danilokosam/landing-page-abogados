@@ -96,6 +96,12 @@ Animación a pantalla completa de ~2.9 s antes de mostrar el contenido (`src/com
 - **Layout shift corregido (reportado por el usuario):** el `overflow: hidden` de `html.intro-activa` ocultaba la barra de desplazamiento. Al terminar la intro reaparecía, estrechaba el viewport ~15 px y el contenido saltaba (el titular, 7 px). Se resolvió con `scrollbar-gutter: stable` solo durante la intro, junto con fondo de tinta en `<html>` para que el hueco reservado no se vea como una franja clara junto al telón. No se aplica de forma global porque reservaría el hueco también fuera de la intro (rompía el ancho del panel del menú móvil en `mobile-menu.spec.ts`). Cubierto por `tests/e2e/intro-layout-shift.spec.ts`, que lanza Chromium sin `--hide-scrollbars`, la opción por defecto de Playwright que ocultaba justo este bug.
 - **Compromiso conocido:** el contenido real se muestra unos 2.3 s más tarde en la primera visita. Es inherente a una intro de este tipo y se limita a una vez por sesión.
 
+## Tests unitarios y caché de Content Collections (13 de noviembre de 2026)
+
+**Problema:** los tests de componentes que usan `getCollection()` leían una caché vieja. Vitest arranca Vite en modo "serve", así que Astro lee el data store de desarrollo (`.astro/data-store.json`), pero `getViteConfig()` crea ese entorno con `sync: false` y nunca lo rellena. Solo `astro dev` escribía ese archivo; `astro sync` escribe el suyo en `cacheDir` (`node_modules/.astro/`). Consecuencia: colecciones vacías si nunca se había arrancado `astro dev`, o datos y esquema desactualizados tras editar contenido (se vio con el campo nuevo `experiencia`).
+
+**Solución:** `tests/setup/sincronizar-contenido.ts`, `globalSetup` de Vitest que ejecuta el CLI `astro sync` y copia su data store a `.astro/data-store.json` antes de cada ejecución. Se lanza como proceso aparte porque Vite transforma el setup con la config de Astro y ahí `import { sync } from 'astro'` no resuelve a la API de Node. Guarda de regresión: `tests/unit/contenido-sincronizado.test.ts` compara las colecciones con los `.md` en disco; se comprobó que falla si se desactiva el setup. En `test:watch`, si se edita contenido, hay que relanzar Vitest.
+
 ## Roadmap de fases
 
 - [ ] **Fase 0 — Descubrimiento y contenido real.** Bios, fotos, áreas de práctica, honorarios, número de WhatsApp reales del cliente. _(Sigue bloqueada en insumo del cliente — ver aviso de contenido ficticio abajo. No confundir con la Fase 2, que ya avanzó usando datos de relleno.)_
@@ -107,11 +113,21 @@ Animación a pantalla completa de ~2.9 s antes de mostrar el contenido (`src/com
 - [ ] **Fase 6 — Testing y QA.** Lighthouse, prueba de enlaces WhatsApp, `prefers-reduced-motion`, cross-browser (prioridad Safari iOS).
 - [ ] **Fase 7 — Despliegue.** Hosting, dominio, analítica, Search Console.
 
-## ⚠️ Contenido ficticio — no confundir con datos reales del cliente
+## Contenido real (13 de noviembre de 2026) — reemplaza al contenido ficticio de desarrollo
 
-Para no bloquear el avance estructural mientras el cliente recopila su material (Fase 0), esta sesión pobló `negocio.ts` y las colecciones de contenido con un despacho, socios y honorarios **inventados pero verosímiles**: "Duarte & Iglesias Abogados", Elena Duarte Ríos y Javier Iglesias Montes, dirección en Calle de Alcalá (Madrid), teléfono `+34612345678`, email `info@duarteiglesiasabogados.es`. Las fotos de los socios son avatares SVG con monograma (iniciales sobre un círculo), no fotografías — se evitó deliberadamente usar imágenes de stock de personas reales (p. ej. Unsplash) como retrato de un abogado ficticio.
+El despacho ficticio de Madrid ("Duarte & Iglesias", Elena Duarte / Javier Iglesias, precios en €, RGPD) se reemplazó por los datos reales de los dos abogados, tomados de sus hojas de vida: **Natalia Muñoz Taborda** (abogada litigante, especialista en Derecho Penal y en Derecho Administrativo, docente de Derecho Penal) y **Fredy Humberto Duarte Mora** (abogado, especialista en Derecho Administrativo, Inspector del INPEC 1999–2022). Ubicación: Itagüí, Antioquia (Colombia).
 
-**Antes de desplegar a producción o compartir una vista previa con el cliente**, todo esto debe reemplazarse por datos reales (Fase 0). Buscar `Duarte & Iglesias`, `duarteiglesiasabogados.es` y `+34612345678` en el repo para localizar cada punto de reemplazo.
+- **Perfiles** (`src/content/socios/natalia-munoz.md`, `fredy-duarte.md`): solo información profesional. Se excluyeron a propósito cédula, fecha y lugar de nacimiento, estado civil, dirección de domicilio, teléfonos y correos personales, referencias de terceros, estudios primarios/secundarios y empleos no jurídicos. Campo nuevo `experiencia` en el esquema de `socios`; `acreditaciones` solo se muestra si tiene datos.
+- **Áreas de práctica**: las 6 ficticias se sustituyeron por 5 respaldadas por los currículums: Derecho Penal, Asuntos penitenciarios, Derecho Administrativo, Tutelas y derechos de petición, y Contratos. `rangoHonorarios` pasó a ser opcional (no hay honorarios reales) y la tarjeta oculta el bloque si falta.
+- **Cifras clave**: todas verificables. 2 abogados; años de ejercicio calculados en build desde 2017; 23 años en el INPEC; 3 especializaciones.
+- **Footer**: aviso de tratamiento de datos según la Ley 1581 de 2012 y el Decreto 1377 de 2013 (antes RGPD). Teléfono en formato legible vía `formatearTelefono()` (`negocio.ts`). Sin dirección de calle (`calle` es opcional) y sin horario (`horario: []`), y los bloques se ocultan si faltan.
+- **Pendiente de confirmar con el cliente:**
+  1. Nombre comercial: se usa **"Duarte & Muñoz Abogados"** (apellidos de ambos, en el orden de su empresa existente "Transportadora y Distribuidora Duarte Muñoz") — es una suposición; se cambia en una sola línea de `negocio.ts`.
+  2. Contacto: WhatsApp y email son los personales de Natalia (`+573124874581`, `naty11_02@hotmail.com`). Recomendable un correo con dominio propio.
+  3. Cargo de cada uno ("Abogada litigante" / "Abogado") — ¿son socios fundadores?
+  4. El diplomado de defensa penal figura como "Universidad UNISABANA" en el CV de Natalia y "UNISABANETA" en el de Fredy (mismo diplomado, mismas fechas) — posible errata; se dejó como está escrito.
+  5. Textos de compromiso del sitio (no salen de los CV): los 3 pasos del Hero, "Atención directa de los abogados", la cita de Sobre nosotros, "le explicaremos los honorarios antes de empezar".
+  6. Horario de atención y, si se desea publicar, una dirección de oficina (no la de domicilio).
 
 ## Estado actual
 

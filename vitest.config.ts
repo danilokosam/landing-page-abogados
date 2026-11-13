@@ -12,6 +12,10 @@ export default getViteConfig({
     environment: 'node',
     globals: false,
     include: ['tests/unit/**/*.test.ts', 'tests/components/**/*.test.ts'],
+    // Rellena el data store de Content Collections antes de los tests —
+    // sin esto, getCollection() lee lo que dejó el último `astro dev`
+    // (ver el comentario de cabecera del propio archivo).
+    globalSetup: ['tests/setup/sincronizar-contenido.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
