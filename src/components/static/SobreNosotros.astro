@@ -7,14 +7,6 @@ const sociosConContenido = await Promise.all(
   socios.map(async (socio) => ({ socio, ...(await render(socio)) })),
 );
 
-// Transición compartida del hover/foco de las fichas: borde, sombra, filete
-// superior y aro del retrato usan la misma curva (ease-out suave, sin rebote)
-// y duración, así se mueven a la vez. hover: de Tailwind v4 solo aplica en
-// dispositivos con puntero (sin hover "pegado" en táctil) y motion-reduce
-// quita la animación —el cambio de estado sigue, pero instantáneo— para
-// quien pide reducir movimiento.
-const transicion = 'duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none';
-
 // Bloques de trayectoria de cada ficha; los vacíos no se muestran.
 const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
   [
@@ -68,28 +60,13 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     <div class="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0" data-reveal="right">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article
-            class:list={[
-              'group border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid',
-              transicion,
-              'transition-[border-color,box-shadow]',
-              'hover:border-gold/50 focus-within:border-gold/50',
-              'focus-within:shadow-[0_28px_56px_-36px_rgb(20_23_30/0.28)] hover:shadow-[0_28px_56px_-36px_rgb(20_23_30/0.28)]',
-              'dark:focus-within:shadow-[0_28px_56px_-32px_rgb(0_0_0/0.75)] dark:hover:shadow-[0_28px_56px_-32px_rgb(0_0_0/0.75)]',
-            ]}
-          >
-            {/*
-              Acento discreto: filete dorado en el borde superior que se alarga
-              al pasar. Se anima con transform (scale-x desde la izquierda), no
-              con width, para no recalcular el layout en cada fotograma.
-            */}
+          <article class="ficha border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid">
+            {/* Halo exterior + profundidad (ver <style>): solo cambia su opacidad. */}
+            <span aria-hidden="true" class="ficha-halo" />
+            {/* Acento: filete dorado superior que se alarga desde la izquierda. */}
             <span
               aria-hidden="true"
-              class:list={[
-                'bg-gold absolute -top-px left-6 h-px w-24 origin-left scale-x-50 sm:left-10',
-                transicion,
-                'transition-transform group-focus-within:scale-x-100 group-hover:scale-x-100',
-              ]}
+              class="ficha-filete bg-gold absolute -top-px left-6 h-px w-24 sm:left-10"
             />
 
             <header class="flex items-center gap-5 sm:gap-7">
@@ -99,13 +76,7 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
                 foto con el fondo de la ficha usando el token `card`, que ya cambia
                 solo entre claro y oscuro (variables CSS), sin necesitar `dark:`.
               */}
-              <div
-                class:list={[
-                  'ring-gold/50 ring-offset-card relative h-24 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-offset-4 sm:h-28 sm:w-28',
-                  transicion,
-                  'group-focus-within:ring-gold/90 group-hover:ring-gold/90 transition-[box-shadow]',
-                ]}
-              >
+              <div class="ficha-retrato relative h-24 w-24 shrink-0 overflow-hidden rounded-full sm:h-28 sm:w-28">
                 <img
                   src={socio.data.foto}
                   alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
@@ -197,3 +168,164 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     </div>
   </div>
 </section>
+
+<style>
+  /*
+   * Hover de las fichas — «foco de luz» dorado que sigue al cursor, en capas:
+   *   ::after       borde iluminado: degradado radial en la posición del
+   *                 puntero, recortado con máscara a la franja de 1 px del borde.
+   *   ::before      resplandor interior muy tenue (z-index -1, bajo el texto).
+   *   .ficha-halo   halo dorado exterior + sombra de profundidad.
+   *   .ficha-filete filete superior que se alarga (transform).
+   *   .ficha-retrato aro del retrato que se intensifica.
+   *
+   * Rendimiento: las capas se encienden solo con opacity y el filete con
+   * transform — nada se desplaza ni re-maqueta y el texto no se transforma,
+   * así que se mantiene nítido. --x/--y (posición del puntero) los actualiza
+   * el script de abajo, como mucho una vez por fotograma.
+   *
+   * Solo con puntero fino que admite hover (sin estado "pegado" en táctil);
+   * con foco de teclado dentro de la ficha se muestra el mismo estado, fijo.
+   * Con prefers-reduced-motion: sin transiciones ni seguimiento del cursor.
+   */
+  .ficha {
+    --x: 50%;
+    --y: 0%;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Tono del borde iluminado: oro viejo en claro, champán en oscuro. */
+    --brillo: var(--accent);
+    isolation: isolate;
+    transition: border-color 0.5s var(--ease);
+  }
+
+  .ficha::before,
+  .ficha::after,
+  .ficha-halo {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+
+  .ficha::before {
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      520px circle at var(--x) var(--y),
+      color-mix(in oklab, var(--gold) 11%, transparent),
+      transparent 65%
+    );
+  }
+
+  .ficha::after {
+    inset: -1px;
+    padding: 1px;
+    background: radial-gradient(
+      320px circle at var(--x) var(--y),
+      var(--brillo),
+      color-mix(in oklab, var(--brillo) 55%, transparent) 30%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+
+  .ficha-halo {
+    inset: 0;
+    z-index: -2;
+    box-shadow:
+      0 32px 64px -34px rgb(20 23 30 / 0.3),
+      0 0 44px -14px color-mix(in oklab, var(--gold) 45%, transparent);
+  }
+  :global(.dark) .ficha-halo {
+    box-shadow:
+      0 36px 72px -30px rgb(0 0 0 / 0.85),
+      0 0 56px -12px color-mix(in oklab, var(--gold) 34%, transparent);
+  }
+
+  .ficha-filete {
+    transform: scaleX(0.5);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease);
+  }
+
+  .ficha-retrato {
+    box-shadow:
+      0 0 0 4px var(--card),
+      0 0 0 5px color-mix(in oklab, var(--gold) 50%, transparent);
+    transition: box-shadow 0.5s var(--ease);
+  }
+
+  /* Estado activo: hover con puntero fino, o foco de teclado dentro. */
+  @media (hover: hover) and (pointer: fine) {
+    .ficha:hover {
+      border-color: color-mix(in oklab, var(--gold) 30%, var(--border));
+    }
+    .ficha:hover::before,
+    .ficha:hover::after,
+    .ficha:hover .ficha-halo {
+      opacity: 1;
+    }
+    .ficha:hover .ficha-filete {
+      transform: scaleX(1);
+    }
+    .ficha:hover .ficha-retrato {
+      box-shadow:
+        0 0 0 4px var(--card),
+        0 0 0 5px var(--gold);
+    }
+  }
+  .ficha:focus-within {
+    border-color: color-mix(in oklab, var(--gold) 30%, var(--border));
+  }
+  .ficha:focus-within::before,
+  .ficha:focus-within::after,
+  .ficha:focus-within .ficha-halo {
+    opacity: 1;
+  }
+  .ficha:focus-within .ficha-filete {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ficha,
+    .ficha::before,
+    .ficha::after,
+    .ficha-halo,
+    .ficha-filete,
+    .ficha-retrato {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Seguimiento del cursor para el foco de luz (--x/--y). Solo con puntero
+  // fino con hover y sin prefers-reduced-motion; si no, la luz queda fija
+  // arriba al centro (valores por defecto del CSS). rAF: una escritura por
+  // fotograma como máximo, y solo afecta al pintado de la propia ficha.
+  const puedeSeguir = window.matchMedia(
+    '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)',
+  );
+
+  if (puedeSeguir.matches) {
+    for (const ficha of document.querySelectorAll<HTMLElement>('#sobre-nosotros .ficha')) {
+      let frame = 0;
+      ficha.addEventListener('pointermove', (evento) => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          const caja = ficha.getBoundingClientRect();
+          ficha.style.setProperty('--x', `${evento.clientX - caja.left}px`);
+          ficha.style.setProperty('--y', `${evento.clientY - caja.top}px`);
+        });
+      });
+    }
+  }
+</script>

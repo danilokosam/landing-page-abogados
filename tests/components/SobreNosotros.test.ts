@@ -70,16 +70,12 @@ describe('SobreNosotros', () => {
     }
   });
 
-  it('el hover/foco de la ficha anima con transform y respeta prefers-reduced-motion', () => {
+  it('cada ficha incluye las capas del efecto hover (halo, filete y aro del retrato)', () => {
     for (const ficha of dom.window.document.querySelectorAll('article')) {
-      expect(ficha.className).toContain('motion-reduce:transition-none');
-      expect(ficha.className).toContain('focus-within:border-gold/50');
-      const filete = ficha.querySelector(':scope > span[aria-hidden="true"]');
-      // Escala (transform), no width: no recalcula el layout en cada fotograma.
-      expect(filete?.className).toContain('scale-x-50');
-      expect(filete?.className).toContain('group-hover:scale-x-100');
-      expect(filete?.className).not.toMatch(/group-hover:w-/);
-      expect(filete?.className).toContain('motion-reduce:transition-none');
+      expect(ficha.classList.contains('ficha')).toBe(true);
+      expect(ficha.querySelector(':scope > .ficha-halo[aria-hidden="true"]')).not.toBeNull();
+      expect(ficha.querySelector(':scope > .ficha-filete[aria-hidden="true"]')).not.toBeNull();
+      expect(ficha.querySelector('.ficha-retrato img')).not.toBeNull();
     }
   });
 });
