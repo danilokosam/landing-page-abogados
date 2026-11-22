@@ -23,6 +23,11 @@ describe('Footer', () => {
     expect(textoCompleto).toContain(negocio.email);
   });
 
+  it('el aviso de datos separa el correo con un espacio ("escribiendo a correo")', () => {
+    const texto = (dom.window.document.body.textContent ?? '').replace(/\s+/g, ' ');
+    expect(texto).toContain(`escribiendo a ${negocio.email}.`);
+  });
+
   it('los enlaces tel: y mailto: usan el mismo teléfono/email que el texto visible', () => {
     const enlaceTel = dom.window.document.querySelector('a[href^="tel:"]');
     const enlaceMail = dom.window.document.querySelector('a[href^="mailto:"]');
