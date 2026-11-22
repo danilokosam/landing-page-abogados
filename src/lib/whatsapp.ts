@@ -15,3 +15,11 @@ export function construirEnlaceWhatsApp(
   const mensajeCodificado = encodeURIComponent(mensaje);
   return `https://wa.me/${numeroLimpio}?text=${mensajeCodificado}`;
 }
+
+/**
+ * Mensaje precargado del botón flotante de WhatsApp (BotonesFlotantes.astro).
+ * Es el canal genérico, visible en toda la página: por eso no nombra un
+ * área concreta (para eso están los mensajes de cada servicio). El número
+ * destino sale de `negocio.telefonoWhatsapp` en src/lib/negocio.ts.
+ */
+export const mensajeWhatsappFlotante = `Hola, ${negocio.nombreDespacho}. Me gustaría agendar una consulta para exponerles mi caso. ¿Podrían indicarme su disponibilidad? Muchas gracias.`;

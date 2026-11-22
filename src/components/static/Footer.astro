@@ -139,7 +139,12 @@ const enlaceClase =
       </div>
     </div>
 
-    <div class="border-ink-border border-t py-8 text-xs leading-relaxed">
+    <!--
+      pb extra por debajo de xl: reserva el hueco de los botones flotantes
+      (BotonesFlotantes.astro) para que, al llegar al final de la página, no
+      tapen el aviso de datos ni el copyright, que ocupan todo el ancho.
+    -->
+    <div class="border-ink-border border-t pt-8 pb-36 text-xs leading-relaxed sm:pb-40 xl:pb-8">
       <p class="max-w-4xl">
         Tratamiento de datos personales: {negocio.nombreDespacho} trata los datos facilitados a través
         de este sitio con la única finalidad de responder a su consulta, conforme a la Ley 1581 de 2012
