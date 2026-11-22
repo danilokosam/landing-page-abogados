@@ -1,63 +1,87 @@
 ---
 import { getCollection, render } from 'astro:content';
-import { Icon } from 'astro-icon/components';
+import { descomponerItemTrayectoria } from '@/lib/trayectoria';
 
 const socios = (await getCollection('socios')).sort((a, b) => a.data.orden - b.data.orden);
 const sociosConContenido = await Promise.all(
   socios.map(async (socio) => ({ socio, ...(await render(socio)) })),
 );
+
+// Bloques de trayectoria de cada ficha; los vacíos no se muestran.
+const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
+  [
+    { titulo: 'Formación', items: datos.formacion },
+    { titulo: 'Experiencia', items: datos.experiencia },
+    { titulo: 'Acreditaciones', items: datos.acreditaciones },
+  ]
+    .filter((bloque) => bloque.items.length > 0)
+    .map((bloque) => ({ ...bloque, items: bloque.items.map(descomponerItemTrayectoria) }));
 ---
 
 <section id="sobre-nosotros" class="scroll-mt-20">
-  <div
-    class="mx-auto grid max-w-7xl gap-14 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:gap-10 lg:px-10 lg:py-32"
-  >
-    <div class="lg:col-span-4" data-reveal="left">
-      <div>
+  <div class="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10 lg:py-32">
+    <div class="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-10" data-reveal="left">
+      <div class="lg:col-span-7">
         <p class="eyebrow">Trayectoria</p>
         <h2
           class="text-foreground mt-5 font-serif text-4xl leading-[1.1] font-medium tracking-tight text-balance sm:text-5xl"
         >
           Nuestros abogados
         </h2>
-        <p class="text-muted-foreground mt-6 text-base leading-relaxed sm:text-lg">
+        <p class="text-muted-foreground mt-6 max-w-2xl text-base leading-relaxed sm:text-lg">
           Dos trayectorias complementarias: el ejercicio litigante y la docencia en Derecho Penal, y
           más de dos décadas de experiencia dentro del sistema penitenciario.
         </p>
-
-        <figure class="border-gold mt-10 border-l pl-6">
-          <blockquote
-            class="text-foreground font-serif text-xl leading-snug font-medium italic sm:text-2xl"
-          >
-            «Su asunto nunca pasa a un tercero: lo lleva de principio a fin uno de nuestros
-            abogados.»
-          </blockquote>
-          <figcaption
-            class="text-muted-foreground mt-4 text-xs font-semibold tracking-[0.18em] uppercase"
-          >
-            Nuestro compromiso
-          </figcaption>
-        </figure>
       </div>
+
+      <figure class="border-gold border-l pl-6 lg:col-span-5">
+        <blockquote
+          class="text-foreground font-serif text-xl leading-snug font-medium text-pretty italic sm:text-2xl"
+        >
+          «Su asunto nunca pasa a un tercero: lo lleva de principio a fin uno de nuestros abogados.»
+        </blockquote>
+        <figcaption
+          class="text-muted-foreground mt-4 text-xs font-semibold tracking-[0.18em] uppercase"
+        >
+          Nuestro compromiso
+        </figcaption>
+      </figure>
     </div>
 
-    <div class="space-y-8 lg:col-span-8" data-reveal="right">
+    {
+      /*
+      Fichas: en escritorio van lado a lado y comparten filas vía subgrid
+      (cabecera, enfoque, biografía, trayectoria), así cada bloque arranca a
+      la misma altura en ambas aunque los textos tengan longitudes distintas.
+      gap-y-0 en lg porque la subgrid hereda el gap de filas del padre; el
+      aire vertical lo da el propio contenido de cada fila.
+    */
+    }
+    <div class="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0" data-reveal="right">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article class="border-border bg-card hover:border-gold/60 relative border p-7 transition-colors duration-500 sm:p-10">
-            <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-7">
+          <article class="ficha border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid">
+            {/* Halo exterior + profundidad (ver <style>): solo cambia su opacidad. */}
+            <span aria-hidden="true" class="ficha-halo" />
+            {/* Acento: filete dorado superior que se alarga desde la izquierda. */}
+            <span
+              aria-hidden="true"
+              class="ficha-filete bg-gold absolute -top-px left-6 h-px w-24 sm:left-10"
+            />
+
+            <header class="flex items-center gap-5 sm:gap-7">
               {/*
                 Retrato circular: la foto (vertical, 3:4) se recorta con object-cover
                 anclado arriba para no cortar la cabeza. El velo inferior funde la
-                foto con el fondo de la tarjeta usando el token `card`, que ya cambia
+                foto con el fondo de la ficha usando el token `card`, que ya cambia
                 solo entre claro y oscuro (variables CSS), sin necesitar `dark:`.
               */}
-              <div class="ring-gold/50 ring-offset-card relative h-24 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-offset-4">
+              <div class="ficha-retrato relative h-24 w-24 shrink-0 overflow-hidden rounded-full sm:h-28 sm:w-28">
                 <img
                   src={socio.data.foto}
                   alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
-                  width="96"
-                  height="96"
+                  width="112"
+                  height="112"
                   loading="lazy"
                   decoding="async"
                   class="h-full w-full object-cover object-top"
@@ -67,79 +91,241 @@ const sociosConContenido = await Promise.all(
                   class="from-card via-card/40 pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t via-40% to-transparent"
                 />
               </div>
-              <div>
-                <h3 class="text-foreground font-serif text-2xl font-medium sm:text-[1.75rem]">
-                  {socio.data.nombre}
-                </h3>
-                <p class="text-accent mt-1.5 text-xs font-semibold tracking-[0.18em] uppercase">
+              <div class="min-w-0">
+                <p class="text-accent text-[0.6875rem] font-semibold tracking-[0.2em] uppercase">
                   {socio.data.cargo}
                 </p>
+                <h3 class="text-foreground mt-2 font-serif text-2xl leading-tight font-medium text-balance sm:text-[1.75rem]">
+                  {socio.data.nombre}
+                </h3>
               </div>
+            </header>
+
+            {/*
+              Enfoque jurídico: especialidades separadas por puntos dorados. Cada
+              item lleva su punto delante y la lista se desplaza -1rem (punto +
+              márgenes) dentro de un contenedor con overflow oculto: así el punto
+              que abre cada línea queda recortado y nunca aparece uno suelto al
+              principio cuando la lista salta de línea.
+            */}
+            <div class="mt-7 overflow-hidden">
+              <ul
+                class="text-foreground/80 -ml-4 flex flex-wrap gap-y-1.5 text-[0.8125rem] font-medium"
+                aria-label={`Especialidades de ${socio.data.nombre}`}
+              >
+                {socio.data.especialidades.map((especialidad) => (
+                  <li class="flex items-center">
+                    <span aria-hidden="true" class="bg-gold mx-1.5 h-1 w-1 shrink-0 rounded-full" />
+                    {especialidad}
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            <div class="text-muted-foreground mt-7 space-y-3 text-[0.9375rem] leading-relaxed">
+            <div class="border-border text-muted-foreground [&>p:first-child]:text-foreground/85 mt-7 space-y-3 border-t pt-7 text-[0.9375rem] leading-relaxed text-pretty">
               <Content />
             </div>
 
-            <dl class="border-border mt-8 grid gap-6 border-t pt-7 text-sm sm:grid-cols-2">
-              <div>
-                <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
-                  <Icon
-                    name="lucide:graduation-cap"
-                    class="text-accent h-4 w-4"
-                    aria-hidden="true"
-                  />
-                  Formación
-                </dt>
-                <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
-                  {socio.data.formacion.map((item) => (
-                    <p>{item}</p>
-                  ))}
-                </dd>
-              </div>
-
-              {socio.data.experiencia.length > 0 && (
-                <div>
-                  <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
-                    <Icon name="lucide:briefcase" class="text-accent h-4 w-4" aria-hidden="true" />
-                    Experiencia
-                  </dt>
-                  <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
-                    {socio.data.experiencia.map((item) => (
-                      <p>{item}</p>
+            <div class="border-border mt-8 space-y-8 border-t pt-8">
+              {bloquesTrayectoria(socio.data).map((bloque) => (
+                <section aria-label={`${bloque.titulo} de ${socio.data.nombre}`}>
+                  <h4 class="text-foreground text-[0.6875rem] font-semibold tracking-[0.2em] uppercase">
+                    {bloque.titulo}
+                  </h4>
+                  <ol class="border-border mt-4 space-y-4 border-l pl-5">
+                    {bloque.items.map((item) => (
+                      <li class="relative">
+                        <span
+                          aria-hidden="true"
+                          class="bg-card border-gold absolute top-[0.45rem] -left-[1.5625rem] h-2 w-2 rounded-full border"
+                        />
+                        <p class="text-foreground text-sm leading-snug font-medium">
+                          {item.titulo}
+                        </p>
+                        {(item.entidad || item.periodo) && (
+                          <p class="text-muted-foreground mt-1 text-[0.8125rem] leading-snug">
+                            {item.entidad}
+                            {item.entidad && item.periodo && (
+                              <>
+                                <span aria-hidden="true" class="text-gold mx-1.5">
+                                  ·
+                                </span>
+                                <span class="sr-only">, </span>
+                              </>
+                            )}
+                            {item.periodo && <span class="tabular-nums">{item.periodo}</span>}
+                          </p>
+                        )}
+                      </li>
                     ))}
-                  </dd>
-                </div>
-              )}
-
-              {socio.data.acreditaciones.length > 0 && (
-                <div>
-                  <dt class="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase">
-                    <Icon name="lucide:award" class="text-accent h-4 w-4" aria-hidden="true" />
-                    Acreditaciones
-                  </dt>
-                  <dd class="text-muted-foreground mt-3 space-y-1.5 leading-relaxed">
-                    {socio.data.acreditaciones.map((item) => (
-                      <p>{item}</p>
-                    ))}
-                  </dd>
-                </div>
-              )}
-            </dl>
-
-            <ul
-              class="mt-7 flex flex-wrap gap-2"
-              aria-label={`Especialidades de ${socio.data.nombre}`}
-            >
-              {socio.data.especialidades.map((especialidad) => (
-                <li class="border-border text-foreground/80 rounded-full border px-3.5 py-1 text-xs font-medium">
-                  {especialidad}
-                </li>
+                  </ol>
+                </section>
               ))}
-            </ul>
+            </div>
           </article>
         ))
       }
     </div>
   </div>
 </section>
+
+<style>
+  /*
+   * Hover de las fichas — «foco de luz» dorado que sigue al cursor, en capas:
+   *   ::after       borde iluminado: degradado radial en la posición del
+   *                 puntero, recortado con máscara a la franja de 1 px del borde.
+   *   ::before      resplandor interior muy tenue (z-index -1, bajo el texto).
+   *   .ficha-halo   halo dorado exterior + sombra de profundidad.
+   *   .ficha-filete filete superior que se alarga (transform).
+   *   .ficha-retrato aro del retrato que se intensifica.
+   *
+   * Rendimiento: las capas se encienden solo con opacity y el filete con
+   * transform — nada se desplaza ni re-maqueta y el texto no se transforma,
+   * así que se mantiene nítido. --x/--y (posición del puntero) los actualiza
+   * el script de abajo, como mucho una vez por fotograma.
+   *
+   * Solo con puntero fino que admite hover (sin estado "pegado" en táctil);
+   * con foco de teclado dentro de la ficha se muestra el mismo estado, fijo.
+   * Con prefers-reduced-motion: sin transiciones ni seguimiento del cursor.
+   */
+  .ficha {
+    --x: 50%;
+    --y: 0%;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    /* Tono del borde iluminado: oro viejo en claro, champán en oscuro. */
+    --brillo: var(--accent);
+    isolation: isolate;
+    transition: border-color 0.5s var(--ease);
+  }
+
+  .ficha::before,
+  .ficha::after,
+  .ficha-halo {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+
+  .ficha::before {
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      520px circle at var(--x) var(--y),
+      color-mix(in oklab, var(--gold) 11%, transparent),
+      transparent 65%
+    );
+  }
+
+  .ficha::after {
+    inset: -1px;
+    padding: 1px;
+    background: radial-gradient(
+      320px circle at var(--x) var(--y),
+      var(--brillo),
+      color-mix(in oklab, var(--brillo) 55%, transparent) 30%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+
+  .ficha-halo {
+    inset: 0;
+    z-index: -2;
+    box-shadow:
+      0 32px 64px -34px rgb(20 23 30 / 0.3),
+      0 0 44px -14px color-mix(in oklab, var(--gold) 45%, transparent);
+  }
+  :global(.dark) .ficha-halo {
+    box-shadow:
+      0 36px 72px -30px rgb(0 0 0 / 0.85),
+      0 0 56px -12px color-mix(in oklab, var(--gold) 34%, transparent);
+  }
+
+  .ficha-filete {
+    transform: scaleX(0.5);
+    transform-origin: left;
+    transition: transform 0.7s var(--ease);
+  }
+
+  .ficha-retrato {
+    box-shadow:
+      0 0 0 4px var(--card),
+      0 0 0 5px color-mix(in oklab, var(--gold) 50%, transparent);
+    transition: box-shadow 0.5s var(--ease);
+  }
+
+  /* Estado activo: hover con puntero fino, o foco de teclado dentro. */
+  @media (hover: hover) and (pointer: fine) {
+    .ficha:hover {
+      border-color: color-mix(in oklab, var(--gold) 30%, var(--border));
+    }
+    .ficha:hover::before,
+    .ficha:hover::after,
+    .ficha:hover .ficha-halo {
+      opacity: 1;
+    }
+    .ficha:hover .ficha-filete {
+      transform: scaleX(1);
+    }
+    .ficha:hover .ficha-retrato {
+      box-shadow:
+        0 0 0 4px var(--card),
+        0 0 0 5px var(--gold);
+    }
+  }
+  .ficha:focus-within {
+    border-color: color-mix(in oklab, var(--gold) 30%, var(--border));
+  }
+  .ficha:focus-within::before,
+  .ficha:focus-within::after,
+  .ficha:focus-within .ficha-halo {
+    opacity: 1;
+  }
+  .ficha:focus-within .ficha-filete {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ficha,
+    .ficha::before,
+    .ficha::after,
+    .ficha-halo,
+    .ficha-filete,
+    .ficha-retrato {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Seguimiento del cursor para el foco de luz (--x/--y). Solo con puntero
+  // fino con hover y sin prefers-reduced-motion; si no, la luz queda fija
+  // arriba al centro (valores por defecto del CSS). rAF: una escritura por
+  // fotograma como máximo, y solo afecta al pintado de la propia ficha.
+  const puedeSeguir = window.matchMedia(
+    '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)',
+  );
+
+  if (puedeSeguir.matches) {
+    for (const ficha of document.querySelectorAll<HTMLElement>('#sobre-nosotros .ficha')) {
+      let frame = 0;
+      ficha.addEventListener('pointermove', (evento) => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          const caja = ficha.getBoundingClientRect();
+          ficha.style.setProperty('--x', `${evento.clientX - caja.left}px`);
+          ficha.style.setProperty('--y', `${evento.clientY - caja.top}px`);
+        });
+      });
+    }
+  }
+</script>

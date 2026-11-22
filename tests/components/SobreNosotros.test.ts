@@ -40,4 +40,42 @@ describe('SobreNosotros', () => {
       expect(img.getAttribute('alt')).toMatch(/^Retrato de /);
     }
   });
+
+  it('cada ficha muestra especialidades, biografía y trayectoria con título, entidad y periodo', async () => {
+    const socios = (await getCollection('socios')).sort((a, b) => a.data.orden - b.data.orden);
+    const articulos = Array.from(dom.window.document.querySelectorAll('article'));
+    socios.forEach((socio, i) => {
+      const ficha = articulos[i];
+      const especialidades = ficha.querySelector(
+        `ul[aria-label="Especialidades de ${socio.data.nombre}"]`,
+      );
+      expect(especialidades?.querySelectorAll('li')).toHaveLength(socio.data.especialidades.length);
+
+      const formacion = ficha.querySelector(
+        `section[aria-label="Formación de ${socio.data.nombre}"] ol`,
+      );
+      expect(formacion?.querySelectorAll('li')).toHaveLength(socio.data.formacion.length);
+      // El primer título de formación aparece separado de su entidad/periodo.
+      const primero = formacion?.querySelector('li p');
+      expect(socio.data.formacion[0].startsWith(primero?.textContent?.trim() ?? '∅')).toBe(true);
+    });
+  });
+
+  it('conserva el retrato encuadrado arriba y el velo inferior con el color de la ficha', () => {
+    for (const img of dom.window.document.querySelectorAll('article img')) {
+      expect(img.className).toContain('object-cover');
+      expect(img.className).toContain('object-top');
+      const velo = img.parentElement?.querySelector('span[aria-hidden="true"]');
+      expect(velo?.className).toContain('from-card');
+    }
+  });
+
+  it('cada ficha incluye las capas del efecto hover (halo, filete y aro del retrato)', () => {
+    for (const ficha of dom.window.document.querySelectorAll('article')) {
+      expect(ficha.classList.contains('ficha')).toBe(true);
+      expect(ficha.querySelector(':scope > .ficha-halo[aria-hidden="true"]')).not.toBeNull();
+      expect(ficha.querySelector(':scope > .ficha-filete[aria-hidden="true"]')).not.toBeNull();
+      expect(ficha.querySelector('.ficha-retrato img')).not.toBeNull();
+    }
+  });
 });
