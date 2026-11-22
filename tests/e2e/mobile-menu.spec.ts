@@ -246,7 +246,7 @@ test.describe('Menú móvil — continuidad del scroll al navegar, SIN ScrollSmo
 });
 
 test.describe('Menú móvil — continuidad del scroll al navegar, CON ScrollSmoother activo (bug: salto a 0)', () => {
-  // Viewport angosto (muestra el menú móvil vía el breakpoint md:hidden)
+  // Viewport angosto (muestra el menú móvil vía el breakpoint lg:hidden)
   // pero SIN touch/pointer:coarse — el mismo escenario que reprodujo el
   // bug al probarlo a mano (ventana de escritorio angostada sin emulación
   // táctil): esDispositivoTactil() da false, así que ScrollSmoother SÍ se

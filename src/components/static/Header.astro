@@ -30,20 +30,36 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
       <Monograma
         class="h-10 w-10 shrink-0 transition-opacity duration-300 group-hover:opacity-80"
       />
+      {
+        /*
+        Sin truncate: en los anchos más estrechos (≈320 px) el nombre puede
+        partirse en dos líneas equilibradas antes que cortarse con «…».
+      */
+      }
       <span
-        class="truncate font-serif text-base leading-snug font-medium tracking-tight sm:text-xl"
+        class="font-serif text-base leading-tight font-medium tracking-tight text-balance sm:text-xl"
       >
         {negocio.nombreDespacho}
       </span>
     </a>
 
-    <div class="flex items-center gap-1 sm:gap-2">
-      <nav class="mr-3 hidden items-center gap-9 md:flex lg:mr-6" aria-label="Navegación principal">
+    {
+      /*
+      Breakpoints: la navegación de escritorio necesita ~840 px junto al logo
+      y al CTA, así que aparece desde lg (1024 px); por debajo la sustituye
+      el menú móvil. El CTA "Agendar consulta" ya cabe desde md (768 px).
+    */
+    }
+    <div class="flex shrink-0 items-center gap-1 sm:gap-2">
+      <nav
+        class="mr-2 hidden items-center gap-8 lg:flex xl:mr-6 xl:gap-9"
+        aria-label="Navegación principal"
+      >
         {
           enlaces.map((enlace) => (
             <a
               href={enlace.href}
-              class="text-muted-foreground hover:text-foreground focus-visible:outline-ring after:bg-gold relative py-1 text-[0.8125rem] font-medium tracking-wide transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 focus-visible:outline-2 focus-visible:outline-offset-4"
+              class="text-muted-foreground hover:text-foreground focus-visible:outline-ring after:bg-gold relative py-1 text-[0.8125rem] font-medium tracking-wide whitespace-nowrap transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {enlace.texto}
             </a>
@@ -57,9 +73,9 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(
         href={enlaceWhatsApp}
         target="_blank"
         rel="noopener noreferrer"
-        class="bg-primary text-primary-foreground focus-visible:outline-ring ml-2 hidden items-center gap-2 rounded-full px-5 py-2.5 text-[0.8125rem] font-semibold tracking-wide transition-[opacity,transform] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] md:inline-flex"
+        class="bg-primary text-primary-foreground focus-visible:outline-ring ml-2 hidden items-center gap-2 rounded-full px-5 py-2.5 text-[0.8125rem] font-semibold tracking-wide whitespace-nowrap transition-[opacity,transform] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98] md:inline-flex"
       >
-        <Icon name="lucide:message-circle" class="h-4 w-4" aria-hidden="true" />
+        <Icon name="lucide:message-circle" class="h-4 w-4 shrink-0" aria-hidden="true" />
         Agendar consulta
       </a>
 
