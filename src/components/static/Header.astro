@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import MenuMovil from '@/components/interactive/MenuMovil.astro';
 import ThemeToggle from '@/components/interactive/ThemeToggle.astro';
+import Monograma from '@/components/ui/Monograma.astro';
 import { negocio } from '@/lib/negocio';
 import { construirEnlaceWhatsApp } from '@/lib/whatsapp';
 
@@ -14,16 +15,6 @@ const enlaces = [
 const enlaceWhatsApp = construirEnlaceWhatsApp(
   'Hola, quisiera más información sobre sus servicios.',
 );
-
-// Monograma del logotipo: iniciales de los apellidos del despacho
-// ("Duarte & Muñoz Abogados" → "D·M"), derivado de negocio.ts para no
-// duplicar el nombre a mano.
-const iniciales = negocio.nombreDespacho
-  .split(/\s*&\s*|\s+/)
-  .filter((p) => /^[A-ZÁÉÍÓÚÑ]/.test(p) && p !== 'Abogados')
-  .slice(0, 2)
-  .map((p) => p[0])
-  .join('·');
 ---
 
 <header class="site-header bg-background/80 sticky top-0 z-50 backdrop-blur-md">
@@ -32,15 +23,16 @@ const iniciales = negocio.nombreDespacho
   >
     <a
       href="#"
-      class="group text-foreground focus-visible:outline-ring flex items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4"
+      aria-label={`${negocio.nombreDespacho} — ir al inicio`}
+      class="group text-foreground focus-visible:outline-ring flex min-w-0 items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 sm:gap-3.5"
     >
+      {/* Decorativo: el nombre del despacho ya da nombre al enlace. */}
+      <Monograma
+        class="h-10 w-10 shrink-0 transition-opacity duration-300 group-hover:opacity-80"
+      />
       <span
-        aria-hidden="true"
-        class="border-gold text-accent group-hover:bg-primary group-hover:text-primary-foreground grid h-9 w-9 place-items-center border font-serif text-[0.8rem] font-semibold tracking-wider transition-colors duration-300"
+        class="truncate font-serif text-base leading-snug font-medium tracking-tight sm:text-xl"
       >
-        {iniciales}
-      </span>
-      <span class="font-serif text-base font-medium tracking-tight sm:text-xl">
         {negocio.nombreDespacho}
       </span>
     </a>

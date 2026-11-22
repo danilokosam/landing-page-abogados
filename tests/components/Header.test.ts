@@ -23,6 +23,18 @@ describe('Header', () => {
     expect(dom.window.document.body.textContent).toContain(negocio.nombreDespacho);
   });
 
+  it('muestra el monograma SVG decorativo dentro del enlace de inicio, con nombre accesible', () => {
+    const enlace = dom.window.document.querySelector('header a[href="#"]');
+    expect(enlace?.getAttribute('aria-label')).toContain(negocio.nombreDespacho);
+    const svg = enlace?.querySelector('svg');
+    expect(svg).not.toBeNull();
+    expect(svg?.getAttribute('aria-hidden')).toBe('true');
+    expect(svg?.getAttribute('viewBox')).toBe('0 0 40 40');
+    // Los colores salen de los tokens del tema vía currentColor, nunca hardcodeados.
+    expect(svg?.querySelector('g.text-accent')?.getAttribute('stroke')).toBe('currentColor');
+    expect(svg?.querySelector('g.text-foreground')?.getAttribute('fill')).toBe('currentColor');
+  });
+
   it('incluye la navegación de escritorio con los tres anclajes esperados', () => {
     const nav = dom.window.document.querySelector('nav[aria-label="Navegación principal"]');
     expect(nav).not.toBeNull();
