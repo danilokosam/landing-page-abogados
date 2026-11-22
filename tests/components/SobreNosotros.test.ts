@@ -17,9 +17,24 @@ describe('SobreNosotros', () => {
     expect(dom.window.document.querySelector('section#sobre-nosotros')).not.toBeNull();
   });
 
-  it('marca el titular con data-reveal="left" y las tarjetas con data-reveal="right"', () => {
-    expect(dom.window.document.querySelector('[data-reveal="left"]')).not.toBeNull();
-    expect(dom.window.document.querySelector('[data-reveal="right"]')).not.toBeNull();
+  it('marca encabezado y fichas para las animaciones de scroll (data-anim)', () => {
+    const doc = dom.window.document;
+    expect(doc.querySelector('.eyebrow[data-anim="linea"]')).not.toBeNull();
+    expect(doc.querySelector('h2[data-anim="titulo"]')).not.toBeNull();
+    for (const ficha of doc.querySelectorAll('article')) {
+      expect(ficha.getAttribute('data-anim')).toBe('ficha');
+      // Telón en el panel y asentamiento en un contenedor propio: la imagen
+      // con el zoom de hover (.ficha-foto) no recibe ninguna animación.
+      const telon = ficha.querySelector('figure[data-anim="telon"]');
+      expect(telon?.querySelector('[data-anim="asentar"] img.ficha-foto')).not.toBeNull();
+      expect(ficha.querySelector('img.ficha-foto')?.hasAttribute('data-anim')).toBe(false);
+      expect(ficha.querySelector('.ficha-filete')?.getAttribute('data-anim')).toBe('filete');
+      for (const lista of ficha.querySelectorAll('ol')) {
+        expect(lista.getAttribute('data-anim')).toBe('hitos');
+        // Dentro de un <ol> solo <li>: el trazo es un ::before.
+        expect(Array.from(lista.children).every((hijo) => hijo.tagName === 'LI')).toBe(true);
+      }
+    }
   });
 
   it('renderiza un <article> por cada socio de la colección "socios"', async () => {

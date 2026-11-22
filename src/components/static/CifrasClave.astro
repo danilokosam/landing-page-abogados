@@ -1,9 +1,10 @@
 ---
 /**
  * Banda de cifras clave — puramente estática en su propio marcado
- * (sin <script> propio); los atributos data-counter/data-suffix son
- * consumidos por inicializarContadores() (src/lib/gsap/animations.ts),
- * inicializada una sola vez desde BaseLayout.astro. El texto ya
+ * (sin <script> propio); los atributos data-anim / data-counter /
+ * data-suffix los consume cifrasClave() en src/lib/gsap/animations.ts
+ * (separadores, subida de cifras, contadores y etiquetas), inicializada
+ * una sola vez desde BaseLayout.astro. El texto ya
  * renderiza el valor final, así que sin JS (o con
  * prefers-reduced-motion) la cifra se ve completa igualmente.
  *
@@ -35,18 +36,22 @@ const cifras: CifraClave[] = [
 
 <section id="cifras-clave" class="bg-ink text-ink-foreground relative">
   <div class="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
-    <dl
-      class="lg:divide-ink-border grid grid-cols-2 gap-x-8 gap-y-12 lg:grid-cols-4 lg:gap-x-0 lg:divide-x"
-    >
+    <dl data-anim="cifras" class="grid grid-cols-2 gap-x-8 gap-y-12 lg:grid-cols-4 lg:gap-x-0">
       {
         cifras.map((cifra) => (
-          <div class="lg:px-10 lg:first:pl-0 lg:last:pr-0">
-            <dt class="text-ink-gold font-serif text-5xl leading-none font-medium tracking-tight lg:text-6xl">
+          <div data-anim-item class="cifra lg:px-10 lg:first:pl-0 lg:last:pr-0">
+            <dt
+              data-anim-cifra
+              class="text-ink-gold font-serif text-5xl leading-none font-medium tracking-tight lg:text-6xl"
+            >
               <span data-counter={cifra.valor} data-suffix={cifra.sufijo} class="tabular-nums">
                 {`${cifra.valor}${cifra.sufijo}`}
               </span>
             </dt>
-            <dd class="text-ink-muted-foreground mt-4 max-w-[15rem] text-sm leading-relaxed">
+            <dd
+              data-anim-etiqueta
+              class="text-ink-muted-foreground mt-4 max-w-[15rem] text-sm leading-relaxed"
+            >
               {cifra.etiqueta}
             </dd>
           </div>
@@ -55,3 +60,27 @@ const cifras: CifraClave[] = [
     </dl>
   </div>
 </section>
+
+<style>
+  /*
+   * Separadores verticales entre cifras (escritorio). Antes eran bordes de
+   * `divide-x`; ahora son un ::before cuyo scaleY lee --escala-separador
+   * (1 por defecto), para poder "dibujarlos" al entrar la banda
+   * (cifrasClave() en src/lib/gsap/animations.ts).
+   */
+  @media (min-width: 1024px) {
+    .cifra {
+      position: relative;
+    }
+    .cifra + .cifra::before {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      width: 1px;
+      background: var(--ink-border);
+      transform: scaleY(var(--escala-separador, 1));
+      transform-origin: top;
+    }
+  }
+</style>

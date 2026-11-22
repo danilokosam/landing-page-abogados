@@ -33,7 +33,7 @@ const urlImagenOg = urlAbsoluta(seo.og.imagen, Astro.site);
 ---
 
 <!doctype html>
-<html lang={seo.idioma} class="no-js" data-sin-intro={intro ? undefined : ''}>
+<html lang={seo.idioma} data-sin-intro={intro ? undefined : ''}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -102,13 +102,6 @@ const urlImagenOg = urlAbsoluta(seo.og.imagen, Astro.site);
           // claro por defecto en vez de romper la carga de la página.
         }
       })();
-    </script>
-    <script is:inline>
-      // Bloqueante a propósito: quita "no-js" antes del primer pintado.
-      // global.css oculta los elementos [data-reveal] solo bajo
-      // html:not(.no-js) — así, sin JS (o si este script falla), el
-      // contenido queda visible por defecto en vez de depender de GSAP.
-      document.documentElement.classList.remove('no-js');
     </script>
     <script is:inline>
       // Intro de carga (IntroCarga.astro). Bloqueante a propósito: la clase
@@ -207,10 +200,18 @@ const urlImagenOg = urlAbsoluta(seo.og.imagen, Astro.site);
       import { inicializarScrollSmoother } from '@/lib/gsap/scrollSmoother';
       // La entrada del Hero ya no pasa por aquí: es CSS puro (global.css)
       // para que el titular no espere a la descarga de este bundle.
-      import { inicializarContadores, inicializarRevealsDeScroll } from '@/lib/gsap/animations';
+      // Los estados iniciales ocultos de las animaciones de scroll solo se
+      // activan cuando este módulo añade html.gsap-listo (ver global.css):
+      // si el JS falla, el contenido nunca queda invisible.
+      import {
+        inicializarAnimacionesScroll,
+        inicializarHeaderAlDesplazar,
+        inicializarProfundidad,
+      } from '@/lib/gsap/animations';
       inicializarScrollSmoother();
-      inicializarContadores();
-      inicializarRevealsDeScroll();
+      inicializarAnimacionesScroll();
+      inicializarProfundidad();
+      inicializarHeaderAlDesplazar();
     </script>
   </body>
 </html>

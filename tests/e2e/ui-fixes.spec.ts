@@ -8,15 +8,15 @@ test.describe('Sin desbordamiento horizontal en móvil', () => {
   const { defaultBrowserType: _defaultBrowserType, ...pixel7SinBrowserType } = devices['Pixel 7'];
   test.use({ ...pixel7SinBrowserType });
 
-  test('no hay scroll horizontal justo tras cargar la página (data-reveal="left"/"right" aún sin disparar)', async ({
+  test('no hay scroll horizontal justo tras cargar la página (animaciones de scroll aún sin disparar)', async ({
     page,
   }) => {
     await page.goto('/');
 
-    // Antes de que el usuario haga scroll, los bloques [data-reveal="left"]
-    // (Sobre Nosotros) y [data-reveal="right"] siguen en su estado oculto
-    // con transform: translateX(∓40px) — si nada los recorta, empujan el
-    // ancho scrolleable del documento más allá del viewport.
+    // Antes de que el usuario haga scroll, los bloques animados ([data-anim])
+    // siguen en su estado inicial desplazado — si alguno se desplazara en X
+    // sin nada que lo recorte, empujaría el ancho scrolleable del documento
+    // más allá del viewport (por eso las entradas usan el eje Y).
     const { scrollWidth, clientWidth } = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
@@ -49,8 +49,8 @@ test.describe('Sin desbordamiento horizontal en móvil', () => {
   }) => {
     await page.goto('/');
     await page.locator('#servicios').scrollIntoViewIfNeeded();
-    // Deja tiempo de sobra a los reveals con transform en X para completar
-    // su animación y asentarse en su posición final.
+    // Deja tiempo de sobra a las animaciones de entrada para completarse
+    // y asentarse en su posición final.
     await page.waitForTimeout(1000);
 
     const { scrollWidth, clientWidth } = await page.evaluate(() => ({
@@ -92,8 +92,8 @@ test.describe('Hover ágil en las tarjetas de Servicios', () => {
     const tarjeta = page.locator('#servicios article').first();
     const icono = tarjeta.locator('div').first();
 
-    // Espera a que el reveal de entrada del grid (data-reveal-grid, disparado
-    // por el propio scrollIntoView de hover()) termine de asentarse, para no
+    // Espera a que la entrada por lotes de la tarjeta (data-anim="servicio",
+    // disparada por el propio scrollIntoView) termine de asentarse, para no
     // confundir esa animación con la del hover que se está probando aquí.
     await tarjeta.scrollIntoViewIfNeeded();
     await page.waitForTimeout(1200);

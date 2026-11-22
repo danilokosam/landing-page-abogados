@@ -200,6 +200,16 @@ body {
     );
 }
 
+/*
+ * Línea dorada de los antetítulos animados ([data-anim="linea"]): el ::before
+ * no se puede animar desde JS, así que su scaleX lee --escala-linea (1 por
+ * defecto, 0 solo en el estado inicial de la animación de scroll).
+ */
+[data-anim='linea']::before {
+  transform: scaleX(var(--escala-linea, 1));
+  transform-origin: left;
+}
+
 /* Eyebrow editorial: texto en versalitas precedido de una hairline dorada */
 .eyebrow {
   display: inline-flex;
@@ -220,9 +230,9 @@ body {
 
 /*
  * Recorte horizontal del wrapper de ScrollSmoother — siempre, no solo
- * cuando ScrollSmoother se inicializa. Los bloques [data-reveal="left"]/
- * ["right"] de abajo parten con transform: translateX(∓40px) antes de
- * dispararse; sin nada que los recorte, ese desplazamiente empuja el
+ * cuando ScrollSmoother se inicializa. Si algún bloque animado partiera
+ * desplazado en X antes de dispararse (las entradas actuales, [data-anim],
+ * usan el eje Y), sin nada que lo recorte ese desplazamiento empujaría el
  * ancho scrolleable del documento más allá del viewport (scrollbar
  * horizontal). En escritorio pasa desapercibido porque GSAP le pone su
  * propio overflow:hidden a #smooth-wrapper al crear el ScrollSmoother
@@ -269,6 +279,29 @@ body {
     transparent
   );
   box-shadow: 0 1px 10px -2px color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+/*
+ * Header al desplazarse (inicializarHeaderAlDesplazar en animations.ts): pasada
+ * la parte alta de la página, fondo algo más opaco y una sombra suave para
+ * separarlo del contenido. Solo color y sombra — nunca padding ni altura.
+ */
+.site-header {
+  transition:
+    background-color 0.5s ease,
+    box-shadow 0.5s ease;
+}
+.site-header.header-desplazado {
+  background-color: color-mix(in oklab, var(--background) 94%, transparent);
+  box-shadow: 0 14px 34px -26px rgb(20 23 30 / 0.35);
+}
+.dark .site-header.header-desplazado {
+  box-shadow: 0 14px 34px -22px rgb(0 0 0 / 0.75);
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
 }
 
 /* Scroll suave para los anclajes de navegación (#sobre-nosotros, etc.) */
@@ -354,32 +387,60 @@ html.intro {
   }
 
   /*
-   * Revelados de scroll genéricos — inicializarRevealsDeScroll() en
-   * src/lib/gsap/animations.ts. Mismo patrón que el Hero: el estado
-   * oculto vive solo aquí, GSAP únicamente anima hacia el estado
-   * visible (gsap.to), nunca declara el "from".
-   *   data-reveal="left"|"right" — bloques que entran desde un lado
-   *   (Sobre Nosotros: titular desde la izquierda, tarjetas desde la
-   *   derecha).
-   *   data-reveal="up" — encabezados de sección que entran desde abajo
-   *   (Servicios).
-   *   data-reveal-grid — el grid de tarjetas se revela con stagger; el
-   *   estado inicial se aplica a cada hijo directo, no al contenedor.
+   * Estados iniciales de las animaciones de scroll (src/lib/gsap/animations.ts).
+   * Solo aplican bajo html.gsap-listo: esa clase la añade el propio módulo de
+   * GSAP justo antes de crear las animaciones, y solo sin
+   * prefers-reduced-motion. Si el JS no llega a cargar o falla, la clase nunca
+   * aparece y todo se ve en su estado final. Al terminar cada animación, GSAP
+   * marca el elemento con [data-anim-hecho] y deja de coincidir aquí.
+   * Recorridos en el eje Y (los desplazamientos en X provocaban scroll
+   * horizontal en móvil, ver #smooth-wrapper).
    */
-  html:not(.no-js) [data-reveal='left'] {
-    opacity: 0;
-    transform: translateX(-24px);
-  }
-  html:not(.no-js) [data-reveal='right'] {
-    opacity: 0;
-    transform: translateX(24px);
-  }
-  html:not(.no-js) [data-reveal='up'] {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  html:not(.no-js) [data-reveal-grid] > * {
+  html.gsap-listo
+    :is(
+      [data-anim='subir'],
+      [data-anim='ficha'],
+      [data-anim='servicio'],
+      [data-anim='columna']
+    ):not([data-anim-hecho]) {
     opacity: 0;
     transform: translateY(28px);
+  }
+  /* Títulos: ocultos solo hasta que SplitText los parte en líneas enmascaradas. */
+  html.gsap-listo [data-anim='titulo']:not([data-anim-hecho]) {
+    visibility: hidden;
+  }
+  html.gsap-listo [data-anim='linea']:not([data-anim-hecho]) {
+    --escala-linea: 0;
+    opacity: 0;
+  }
+  html.gsap-listo [data-anim='telon']:not([data-anim-hecho]) {
+    clip-path: inset(100% 0 0 0);
+  }
+  html.gsap-listo [data-anim='asentar']:not([data-anim-hecho]) {
+    transform: translateY(24px) scale(1.04);
+  }
+  html.gsap-listo [data-anim='filete']:not([data-anim-hecho]) {
+    clip-path: inset(0 100% 0 0);
+  }
+  html.gsap-listo [data-anim='hitos']:not([data-anim-hecho]) {
+    --escala-trazo: 0;
+  }
+  html.gsap-listo [data-anim='hitos']:not([data-anim-hecho]) > li {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  html.gsap-listo
+    [data-anim='servicio']:not([data-anim-hecho])
+    :is([data-anim-icono], [data-anim-numero]) {
+    opacity: 0;
+  }
+  html.gsap-listo
+    [data-anim='cifras']:not([data-anim-hecho])
+    :is([data-anim-cifra], [data-anim-etiqueta]) {
+    opacity: 0;
+  }
+  html.gsap-listo [data-anim='cifras']:not([data-anim-hecho]) [data-anim-item] {
+    --escala-separador: 0;
   }
 }

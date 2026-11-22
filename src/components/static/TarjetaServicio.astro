@@ -19,9 +19,11 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(mensajeWhatsapp);
 ---
 
 <article
+  data-anim="servicio"
   class="group border-border bg-card hover:border-gold/70 relative flex flex-col overflow-hidden border p-8 transition-all duration-150 ease-out hover:shadow-xl hover:shadow-black/[0.06] motion-safe:hover:-translate-y-1"
 >
   <div
+    data-anim-icono
     class="border-border text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary flex h-12 w-12 items-center justify-center rounded-full border transition-colors duration-150 ease-out"
   >
     <Icon name={`lucide:${icono}`} class="h-5 w-5" aria-hidden="true" />
@@ -31,6 +33,7 @@ const enlaceWhatsApp = construirEnlaceWhatsApp(mensajeWhatsapp);
     indice !== undefined && (
       <span
         aria-hidden="true"
+        data-anim-numero
         class="text-muted-foreground absolute top-8 right-8 font-serif text-sm tabular-nums"
       >
         {String(indice).padStart(2, '0')}

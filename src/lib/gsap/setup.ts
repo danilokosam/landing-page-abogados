@@ -15,12 +15,15 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
+// SplitText también forma parte del paquete `gsap` estándar y gratuito
+// desde la 3.13 — se usa para el revelado por líneas de los títulos.
+import { SplitText } from 'gsap/SplitText';
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
 
 // Instancia de matchMedia compartida: toda animación debe registrarse
 // dentro de un bloque `respetaMovimiento.add(...)` para heredar el
 // respeto a prefers-reduced-motion desde el primer commit de animación.
 export const respetaMovimiento = gsap.matchMedia();
 
-export { gsap, ScrollTrigger, ScrollSmoother };
+export { gsap, ScrollTrigger, ScrollSmoother, SplitText };

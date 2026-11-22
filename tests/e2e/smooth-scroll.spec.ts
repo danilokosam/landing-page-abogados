@@ -29,11 +29,11 @@ test.describe('Navegación por anclajes con ScrollSmoother (escritorio, sin redu
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollInicial);
   });
 
-  test('la navegación por anclaje también dispara el reveal de scroll de la sección destino', async ({
+  test('la navegación por anclaje también dispara la animación de scroll de la sección destino', async ({
     page,
   }) => {
     const enlace = page.locator('nav[aria-label="Navegación principal"] a[href="#sobre-nosotros"]');
-    const titular = page.locator('[data-reveal="left"]').first();
+    const titular = page.locator('#sobre-nosotros [data-anim="subir"]').first();
 
     await expect(titular).toHaveCSS('opacity', '0');
     await enlace.click();

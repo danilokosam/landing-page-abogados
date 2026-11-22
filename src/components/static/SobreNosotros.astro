@@ -20,21 +20,30 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
 
 <section id="sobre-nosotros" class="scroll-mt-20">
   <div class="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10 lg:py-32">
-    <div class="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-10" data-reveal="left">
+    <div class="grid gap-10 lg:grid-cols-12 lg:items-end lg:gap-10">
       <div class="lg:col-span-7">
-        <p class="eyebrow">Trayectoria</p>
+        <p class="eyebrow" data-anim="linea">Trayectoria</p>
         <h2
+          data-anim="titulo"
           class="text-foreground mt-5 font-serif text-4xl leading-[1.1] font-medium tracking-tight text-balance sm:text-5xl"
         >
           Nuestros abogados
         </h2>
-        <p class="text-muted-foreground mt-6 max-w-2xl text-base leading-relaxed sm:text-lg">
+        <p
+          data-anim="subir"
+          data-anim-retraso="0.15"
+          class="text-muted-foreground mt-6 max-w-2xl text-base leading-relaxed sm:text-lg"
+        >
           Dos trayectorias complementarias: el ejercicio litigante y la docencia en Derecho Penal, y
           más de dos décadas de experiencia dentro del sistema penitenciario.
         </p>
       </div>
 
-      <figure class="border-gold border-l pl-6 lg:col-span-5">
+      <figure
+        data-anim="subir"
+        data-anim-retraso="0.3"
+        class="border-gold border-l pl-6 lg:col-span-5"
+      >
         <blockquote
           class="text-foreground font-serif text-xl leading-snug font-medium text-pretty italic sm:text-2xl"
         >
@@ -57,15 +66,19 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
       aire vertical lo da el propio contenido de cada fila.
     */
     }
-    <div class="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0" data-reveal="right">
+    <div class="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article class="ficha border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-5 lg:grid lg:grid-rows-subgrid">
+          <article
+            data-anim="ficha"
+            class="ficha border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-5 lg:grid lg:grid-rows-subgrid"
+          >
             {/* Halo exterior + profundidad (ver <style>): solo cambia su opacidad. */}
             <span aria-hidden="true" class="ficha-halo" />
             {/* Acento: filete dorado superior que se alarga desde la izquierda. */}
             <span
               aria-hidden="true"
+              data-anim="filete"
               class="ficha-filete bg-gold absolute -top-px left-6 h-px w-24 sm:left-10"
             />
 
@@ -78,16 +91,30 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
               encaja igual en claro y en oscuro. Ocupa todo el ancho de la ficha
               (márgenes negativos).
             */}
-            <figure class="ficha-panel relative -mx-6 -mt-8 h-72 overflow-hidden sm:-mx-10 sm:-mt-10 sm:h-80 lg:h-[22rem]">
-              <img
-                src={socio.data.foto}
-                alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
-                width="720"
-                height="960"
-                loading="lazy"
-                decoding="async"
-                class="ficha-foto absolute inset-x-0 bottom-0 mx-auto h-[92%] w-auto max-w-full object-contain object-bottom"
-              />
+            {/*
+              Animación de entrada (animations.ts): el panel se descubre con un
+              "telón" (clip-path) y la foto se asienta (y + scale) en su propio
+              contenedor; un segundo contenedor da la profundidad ligada al scroll
+              en escritorio. Ninguno toca .ficha-foto, cuyo zoom de hover sigue
+              siendo solo CSS.
+            */}
+            <figure
+              data-anim="telon"
+              class="ficha-panel relative -mx-6 -mt-8 h-72 overflow-hidden sm:-mx-10 sm:-mt-10 sm:h-80 lg:h-[22rem]"
+            >
+              <div data-anim="asentar" class="absolute inset-0">
+                <div data-anim-profundidad="foto" class="absolute inset-0">
+                  <img
+                    src={socio.data.foto}
+                    alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
+                    width="720"
+                    height="960"
+                    loading="lazy"
+                    decoding="async"
+                    class="ficha-foto absolute inset-x-0 bottom-0 mx-auto h-[92%] w-auto max-w-full object-contain object-bottom"
+                  />
+                </div>
+              </div>
             </figure>
 
             <header class="mt-8">
@@ -130,12 +157,12 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
                   <h4 class="text-foreground text-[0.6875rem] font-semibold tracking-[0.2em] uppercase">
                     {bloque.titulo}
                   </h4>
-                  <ol class="border-border mt-4 space-y-4 border-l pl-5">
+                  <ol data-anim="hitos" class="linea-tiempo mt-4 space-y-4 pl-5">
                     {bloque.items.map((item) => (
                       <li class="relative">
                         <span
                           aria-hidden="true"
-                          class="bg-card border-gold absolute top-[0.45rem] -left-[1.5625rem] h-2 w-2 rounded-full border"
+                          class="bg-card border-gold absolute top-[0.45rem] -left-[23.5px] h-2 w-2 rounded-full border"
                         />
                         <p class="text-foreground text-sm leading-snug font-medium">
                           {item.titulo}
@@ -282,6 +309,25 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     mask-composite: intersect;
     transform-origin: 50% 100%;
     transition: transform 0.7s var(--ease);
+  }
+
+  /*
+   * Trazo vertical de la línea de tiempo: un ::before (dentro de un <ol> solo
+   * puede haber <li>) cuyo scaleY lee --escala-trazo, que anima GSAP al
+   * entrar (1 por defecto: sin JS o con movimiento reducido se ve completo).
+   */
+  .linea-tiempo {
+    position: relative;
+  }
+  .linea-tiempo::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 1px;
+    background: var(--border);
+    transform: scaleY(var(--escala-trazo, 1));
+    transform-origin: top;
   }
 
   /* Estado activo: hover con puntero fino, o foco de teclado dentro. */

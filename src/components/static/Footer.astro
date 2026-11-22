@@ -29,27 +29,39 @@ const enlaceClase =
     >
       <div class="lg:col-span-8">
         <p
+          data-anim="linea"
           class="text-ink-gold before:bg-ink-gold flex items-center gap-3.5 text-xs font-semibold tracking-[0.22em] uppercase before:h-px before:w-8 before:content-['']"
         >
           Primer paso
         </p>
         <h2
+          data-anim="titulo"
           class="text-ink-foreground mt-6 font-serif text-4xl leading-[1.08] font-medium tracking-tight text-balance sm:text-5xl lg:text-6xl"
         >
           ¿Hablamos de su caso? <em class="text-ink-gold font-medium">Sin compromiso.</em>
         </h2>
-        <p class="mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
+        <p
+          data-anim="subir"
+          data-anim-retraso="0.2"
+          class="mt-6 max-w-xl text-base leading-relaxed sm:text-lg"
+        >
           Escríbanos por WhatsApp y uno de nuestros abogados estudiará su caso y le responderá
           personalmente.
         </p>
       </div>
-      <div class="lg:col-span-4 lg:flex lg:justify-end">
+      <div data-anim="subir" data-anim-retraso="0.35" class="lg:col-span-4 lg:flex lg:justify-end">
         <a
           href={enlaceWhatsApp}
           target="_blank"
           rel="noopener noreferrer"
-          class="group bg-ink-gold text-ink focus-visible:outline-ink-gold inline-flex w-full items-center justify-center gap-2.5 rounded-full px-8 py-4 text-[0.9375rem] font-semibold tracking-wide transition-[opacity,transform] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 active:scale-[0.98] sm:w-auto"
+          class="group bg-ink-gold text-ink focus-visible:outline-ink-gold relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full px-8 py-4 text-[0.9375rem] font-semibold tracking-wide transition-[opacity,transform] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 active:scale-[0.98] sm:w-auto"
         >
+          {/* Destello dorado: un único barrido al terminar de entrar (animations.ts). */}
+          <span
+            data-anim-destello
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-y-0 left-0 w-2/5 bg-linear-to-r from-transparent via-white/45 to-transparent opacity-0"
+          ></span>
           <Icon name="lucide:message-circle" class="h-[18px] w-[18px]" aria-hidden="true" />
           Escribir por WhatsApp
           <Icon
@@ -62,7 +74,7 @@ const enlaceClase =
     </div>
 
     <div class="grid gap-12 py-16 md:grid-cols-[1.3fr_1fr_0.7fr]">
-      <div>
+      <div data-anim="columna">
         <p class="text-ink-foreground font-serif text-xl font-medium">
           {negocio.nombreDespacho}
         </p>
@@ -71,7 +83,7 @@ const enlaceClase =
         </p>
       </div>
 
-      <div>
+      <div data-anim="columna">
         <h3 class="text-ink-foreground text-xs font-semibold tracking-[0.18em] uppercase">
           Contacto
         </h3>
@@ -121,7 +133,7 @@ const enlaceClase =
         </address>
       </div>
 
-      <div>
+      <div data-anim="columna">
         <h3 class="text-ink-foreground text-xs font-semibold tracking-[0.18em] uppercase">
           Accesos
         </h3>
