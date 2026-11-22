@@ -1,7 +1,7 @@
 ---
 nombre: 'Fredy Humberto Duarte Mora'
 cargo: 'Abogado'
-foto: '/abogado-duarte.jpeg'
+foto: '/abogado-duarte.webp'
 formacion:
   - 'Abogado — UNISABANETA (2013 – 2017)'
   - 'Especialización en Derecho Administrativo — Corporación Universitaria Americana (2020)'

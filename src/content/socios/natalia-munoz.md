@@ -1,7 +1,7 @@
 ---
 nombre: 'Natalia Muñoz Taborda'
 cargo: 'Abogada litigante'
-foto: '/abogada-duarte.jpeg'
+foto: '/abogada-duarte.webp'
 formacion:
   - 'Abogada — UNISABANETA (2017)'
   - 'Especialización en Derecho Penal y Teoría del Delito — Universidad Autónoma de Colombia (2022)'

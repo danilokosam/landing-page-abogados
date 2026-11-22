@@ -4,7 +4,7 @@
 # Copia este archivo sin el guion bajo (ej. socio-1.md) para crear un perfil real.
 nombre: 'Nombre Apellido'
 cargo: 'Socio fundador'
-foto: '/nombre-apellido.jpeg' # ruta absoluta a una foto en public/ (retrato vertical, rostro en la parte superior)
+foto: '/nombre-apellido.webp' # foto en public/: WebP con fondo transparente (retrato vertical, de medio cuerpo)
 formacion:
   - 'Título — Universidad, Año'
 especialidades:

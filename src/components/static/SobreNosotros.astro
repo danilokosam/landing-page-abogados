@@ -51,7 +51,7 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     {
       /*
       Fichas: en escritorio van lado a lado y comparten filas vía subgrid
-      (cabecera, enfoque, biografía, trayectoria), así cada bloque arranca a
+      (foto, cabecera, enfoque, biografía, trayectoria), así cada bloque arranca a
       la misma altura en ambas aunque los textos tengan longitudes distintas.
       gap-y-0 en lg porque la subgrid hereda el gap de filas del padre; el
       aire vertical lo da el propio contenido de cada fila.
@@ -60,7 +60,7 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     <div class="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0" data-reveal="right">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article class="ficha border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid">
+          <article class="ficha border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-5 lg:grid lg:grid-rows-subgrid">
             {/* Halo exterior + profundidad (ver <style>): solo cambia su opacidad. */}
             <span aria-hidden="true" class="ficha-halo" />
             {/* Acento: filete dorado superior que se alarga desde la izquierda. */}
@@ -69,36 +69,34 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
               class="ficha-filete bg-gold absolute -top-px left-6 h-px w-24 sm:left-10"
             />
 
-            <header class="flex items-center gap-5 sm:gap-7">
-              {/*
-                Retrato circular: la foto (vertical, 3:4) se recorta con object-cover
-                anclado arriba para no cortar la cabeza. El velo inferior funde la
-                foto con el fondo de la ficha usando el token `card`, que ya cambia
-                solo entre claro y oscuro (variables CSS), sin necesitar `dark:`.
-              */}
-              <div class="ficha-retrato relative h-24 w-24 shrink-0 overflow-hidden rounded-full sm:h-28 sm:w-28">
-                <img
-                  src={socio.data.foto}
-                  alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
-                  width="112"
-                  height="112"
-                  loading="lazy"
-                  decoding="async"
-                  class="h-full w-full object-cover object-top"
-                />
-                <span
-                  aria-hidden="true"
-                  class="from-card via-card/40 pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t via-40% to-transparent"
-                />
-              </div>
-              <div class="min-w-0">
-                <p class="text-accent text-[0.6875rem] font-semibold tracking-[0.2em] uppercase">
-                  {socio.data.cargo}
-                </p>
-                <h3 class="text-foreground mt-2 font-serif text-2xl leading-tight font-medium text-balance sm:text-[1.75rem]">
-                  {socio.data.nombre}
-                </h3>
-              </div>
+            {/*
+              Panel de retrato editorial: foto con fondo transparente (WebP con
+              alfa) anclada abajo y escalada por altura con su proporción (sin
+              recortes), así nunca se corta la cabeza en ningún ancho. Detrás, un
+              halo cálido y un degradado del tono `muted` al de la ficha; la foto
+              se funde con una máscara (no con un velo de color), por lo que
+              encaja igual en claro y en oscuro. Ocupa todo el ancho de la ficha
+              (márgenes negativos).
+            */}
+            <figure class="ficha-panel relative -mx-6 -mt-8 h-72 overflow-hidden sm:-mx-10 sm:-mt-10 sm:h-80 lg:h-[22rem]">
+              <img
+                src={socio.data.foto}
+                alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
+                width="720"
+                height="960"
+                loading="lazy"
+                decoding="async"
+                class="ficha-foto absolute inset-x-0 bottom-0 mx-auto h-[92%] w-auto max-w-full object-contain object-bottom"
+              />
+            </figure>
+
+            <header class="mt-8">
+              <p class="text-accent text-[0.6875rem] font-semibold tracking-[0.2em] uppercase">
+                {socio.data.cargo}
+              </p>
+              <h3 class="text-foreground mt-2 font-serif text-2xl leading-tight font-medium text-balance sm:text-[1.75rem]">
+                {socio.data.nombre}
+              </h3>
             </header>
 
             {/*
@@ -177,7 +175,7 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
    *   ::before      resplandor interior muy tenue (z-index -1, bajo el texto).
    *   .ficha-halo   halo dorado exterior + sombra de profundidad.
    *   .ficha-filete filete superior que se alarga (transform).
-   *   .ficha-retrato aro del retrato que se intensifica.
+   *   .ficha-foto   el retrato se acerca levemente (transform, solo la imagen).
    *
    * Rendimiento: las capas se encienden solo con opacity y el filete con
    * transform — nada se desplaza ni re-maqueta y el texto no se transforma,
@@ -255,11 +253,35 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     transition: transform 0.7s var(--ease);
   }
 
-  .ficha-retrato {
-    box-shadow:
-      0 0 0 4px var(--card),
-      0 0 0 5px color-mix(in oklab, var(--gold) 50%, transparent);
-    transition: box-shadow 0.5s var(--ease);
+  /* Panel del retrato: halo cálido tras la cabeza + degradado hacia la ficha. */
+  .ficha-panel {
+    background:
+      radial-gradient(
+        60% 55% at 50% 42%,
+        color-mix(in oklab, var(--gold) 16%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(to bottom, var(--muted), var(--card));
+  }
+
+  .ficha-foto {
+    /*
+     * Máscara en dos degradados que se intersecan: uno inferior (los hombros
+     * se disuelven en el panel) y otro lateral muy suave (la foto original
+     * acababa en un corte recto a los lados). La cabeza queda 100 % opaca. El
+     * <img> mide lo mismo que la foto (w-auto + mx-auto), así los porcentajes
+     * se refieren a la imagen y no al panel.
+     */
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 58%, transparent 98%),
+      linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to bottom, #000 58%, transparent 98%),
+      linear-gradient(to right, transparent, #000 16%, #000 84%, transparent);
+    mask-composite: intersect;
+    transform-origin: 50% 100%;
+    transition: transform 0.7s var(--ease);
   }
 
   /* Estado activo: hover con puntero fino, o foco de teclado dentro. */
@@ -275,10 +297,8 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     .ficha:hover .ficha-filete {
       transform: scaleX(1);
     }
-    .ficha:hover .ficha-retrato {
-      box-shadow:
-        0 0 0 4px var(--card),
-        0 0 0 5px var(--gold);
+    .ficha:hover .ficha-foto {
+      transform: scale(1.025);
     }
   }
   .ficha:focus-within {
@@ -299,7 +319,7 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     .ficha::after,
     .ficha-halo,
     .ficha-filete,
-    .ficha-retrato {
+    .ficha-foto {
       transition: none;
     }
   }

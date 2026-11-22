@@ -61,21 +61,25 @@ describe('SobreNosotros', () => {
     });
   });
 
-  it('conserva el retrato encuadrado arriba y el velo inferior con el color de la ficha', () => {
+  it('muestra cada retrato grande, sin recorte circular, anclado abajo y sin cortar la cabeza', () => {
     for (const img of dom.window.document.querySelectorAll('article img')) {
-      expect(img.className).toContain('object-cover');
-      expect(img.className).toContain('object-top');
-      const velo = img.parentElement?.querySelector('span[aria-hidden="true"]');
-      expect(velo?.className).toContain('from-card');
+      // Dentro del panel editorial a todo el ancho de la ficha, no en un círculo.
+      expect(img.closest('figure.ficha-panel')).not.toBeNull();
+      expect(img.closest('.rounded-full')).toBeNull();
+      // object-contain + anclado abajo: la foto entera, nunca se recorta la cabeza.
+      expect(img.className).toContain('object-contain');
+      expect(img.className).toContain('object-bottom');
+      expect(img.className).not.toContain('object-cover');
+      expect(img.getAttribute('src')).toMatch(/\.webp$/);
     }
   });
 
-  it('cada ficha incluye las capas del efecto hover (halo, filete y aro del retrato)', () => {
+  it('cada ficha incluye las capas del efecto hover (halo, filete y foto)', () => {
     for (const ficha of dom.window.document.querySelectorAll('article')) {
       expect(ficha.classList.contains('ficha')).toBe(true);
       expect(ficha.querySelector(':scope > .ficha-halo[aria-hidden="true"]')).not.toBeNull();
       expect(ficha.querySelector(':scope > .ficha-filete[aria-hidden="true"]')).not.toBeNull();
-      expect(ficha.querySelector('.ficha-retrato img')).not.toBeNull();
+      expect(ficha.querySelector('.ficha-panel img.ficha-foto')).not.toBeNull();
     }
   });
 });

@@ -174,7 +174,7 @@ Un archivo por abogado (ver la plantilla `_ejemplo.md`; los archivos que empieza
 ---
 nombre: 'Nombre Apellido'
 cargo: 'Abogada litigante'
-foto: '/nombre-apellido.jpeg' # foto en public/ (retrato vertical; se recorta en círculo desde arriba)
+foto: '/nombre-apellido.webp' # foto en public/: WebP con fondo transparente (retrato vertical)
 formacion: ['Título — Universidad (Año)']
 experiencia: ['Cargo — Entidad (Año – Año)']
 especialidades: ['Derecho Penal']
