@@ -17,7 +17,7 @@ function crearSocioFicticio(
     data: {
       nombre: 'Ana Ejemplo',
       cargo: 'Socia fundadora',
-      foto: { src: '/foto.svg', width: 1, height: 1, format: 'svg' },
+      foto: '/foto.jpeg',
       formacion: ['Licenciada en Derecho'],
       especialidades: ['Derecho Civil', 'Derecho Laboral'],
       acreditaciones: [],

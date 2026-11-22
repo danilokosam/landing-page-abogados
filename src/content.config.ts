@@ -25,11 +25,13 @@ const servicios = defineCollection({
 // Perfiles profesionales de los socios del despacho.
 const socios = defineCollection({
   loader: glob({ pattern: '[^_]*.md', base: './src/content/socios' }),
-  schema: ({ image }) =>
+  schema: () =>
     z.object({
       nombre: z.string(),
       cargo: z.string(), // ej. "Socio fundador"
-      foto: image(),
+      // Ruta absoluta a una foto servida desde public/, ej. "/abogada-duarte.jpeg".
+      // Se muestra recortada en círculo y anclada arriba (ver SobreNosotros.astro).
+      foto: z.string().regex(/^\/[^/]/, 'La foto debe ser una ruta de public/, ej. "/foto.jpeg"'),
       formacion: z.array(z.string()), // títulos, universidades
       especialidades: z.array(z.string()), // áreas de práctica que domina
       experiencia: z.array(z.string()).default([]), // cargos relevantes, del más reciente al más antiguo

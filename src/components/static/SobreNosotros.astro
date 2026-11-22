@@ -1,6 +1,5 @@
 ---
 import { getCollection, render } from 'astro:content';
-import { Image } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 
 const socios = (await getCollection('socios')).sort((a, b) => a.data.orden - b.data.orden);
@@ -47,14 +46,27 @@ const sociosConContenido = await Promise.all(
         sociosConContenido.map(({ socio, Content }) => (
           <article class="border-border bg-card hover:border-gold/60 relative border p-7 transition-colors duration-500 sm:p-10">
             <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-7">
-              <Image
-                src={socio.data.foto}
-                alt={`Retrato de ${socio.data.nombre}`}
-                width={96}
-                height={96}
-                loading="lazy"
-                class="ring-gold/50 ring-offset-card h-24 w-24 shrink-0 rounded-full object-cover ring-1 ring-offset-4"
-              />
+              {/*
+                Retrato circular: la foto (vertical, 3:4) se recorta con object-cover
+                anclado arriba para no cortar la cabeza. El velo inferior funde la
+                foto con el fondo de la tarjeta usando el token `card`, que ya cambia
+                solo entre claro y oscuro (variables CSS), sin necesitar `dark:`.
+              */}
+              <div class="ring-gold/50 ring-offset-card relative h-24 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-offset-4">
+                <img
+                  src={socio.data.foto}
+                  alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
+                  width="96"
+                  height="96"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-full w-full object-cover object-top"
+                />
+                <span
+                  aria-hidden="true"
+                  class="from-card via-card/40 pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t via-40% to-transparent"
+                />
+              </div>
               <div>
                 <h3 class="text-foreground font-serif text-2xl font-medium sm:text-[1.75rem]">
                   {socio.data.nombre}

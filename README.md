@@ -174,7 +174,7 @@ Un archivo por abogado (ver la plantilla `_ejemplo.md`; los archivos que empieza
 ---
 nombre: 'Nombre Apellido'
 cargo: 'Abogada litigante'
-foto: './nombre-apellido.svg' # imagen junto al .md (svg, jpg, png…)
+foto: '/nombre-apellido.jpeg' # foto en public/ (retrato vertical; se recorta en círculo desde arriba)
 formacion: ['Título — Universidad (Año)']
 experiencia: ['Cargo — Entidad (Año – Año)']
 especialidades: ['Derecho Penal']
