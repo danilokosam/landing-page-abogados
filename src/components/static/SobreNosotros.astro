@@ -7,6 +7,14 @@ const sociosConContenido = await Promise.all(
   socios.map(async (socio) => ({ socio, ...(await render(socio)) })),
 );
 
+// Transición compartida del hover/foco de las fichas: borde, sombra, filete
+// superior y aro del retrato usan la misma curva (ease-out suave, sin rebote)
+// y duración, así se mueven a la vez. hover: de Tailwind v4 solo aplica en
+// dispositivos con puntero (sin hover "pegado" en táctil) y motion-reduce
+// quita la animación —el cambio de estado sigue, pero instantáneo— para
+// quien pide reducir movimiento.
+const transicion = 'duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none';
+
 // Bloques de trayectoria de cada ficha; los vacíos no se muestran.
 const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
   [
@@ -60,11 +68,28 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
     <div class="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-0" data-reveal="right">
       {
         sociosConContenido.map(({ socio, Content }) => (
-          <article class="group border-border bg-card hover:border-gold/50 relative flex flex-col border px-6 py-8 transition-colors duration-500 sm:px-10 sm:py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid">
-            {/* Acento discreto: filete dorado en el borde superior, se alarga al pasar. */}
+          <article
+            class:list={[
+              'group border-border bg-card relative flex flex-col border px-6 py-8 sm:px-10 sm:py-10 lg:row-span-4 lg:grid lg:grid-rows-subgrid',
+              transicion,
+              'transition-[border-color,box-shadow]',
+              'hover:border-gold/50 focus-within:border-gold/50',
+              'focus-within:shadow-[0_28px_56px_-36px_rgb(20_23_30/0.28)] hover:shadow-[0_28px_56px_-36px_rgb(20_23_30/0.28)]',
+              'dark:focus-within:shadow-[0_28px_56px_-32px_rgb(0_0_0/0.75)] dark:hover:shadow-[0_28px_56px_-32px_rgb(0_0_0/0.75)]',
+            ]}
+          >
+            {/*
+              Acento discreto: filete dorado en el borde superior que se alarga
+              al pasar. Se anima con transform (scale-x desde la izquierda), no
+              con width, para no recalcular el layout en cada fotograma.
+            */}
             <span
               aria-hidden="true"
-              class="bg-gold absolute -top-px left-6 h-px w-12 transition-[width] duration-500 group-hover:w-24 sm:left-10"
+              class:list={[
+                'bg-gold absolute -top-px left-6 h-px w-24 origin-left scale-x-50 sm:left-10',
+                transicion,
+                'transition-transform group-focus-within:scale-x-100 group-hover:scale-x-100',
+              ]}
             />
 
             <header class="flex items-center gap-5 sm:gap-7">
@@ -74,7 +99,13 @@ const bloquesTrayectoria = (datos: (typeof socios)[number]['data']) =>
                 foto con el fondo de la ficha usando el token `card`, que ya cambia
                 solo entre claro y oscuro (variables CSS), sin necesitar `dark:`.
               */}
-              <div class="ring-gold/50 ring-offset-card relative h-24 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-offset-4 sm:h-28 sm:w-28">
+              <div
+                class:list={[
+                  'ring-gold/50 ring-offset-card relative h-24 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-offset-4 sm:h-28 sm:w-28',
+                  transicion,
+                  'group-focus-within:ring-gold/90 group-hover:ring-gold/90 transition-[box-shadow]',
+                ]}
+              >
                 <img
                   src={socio.data.foto}
                   alt={`Retrato de ${socio.data.nombre}, ${socio.data.cargo.toLowerCase()}`}
