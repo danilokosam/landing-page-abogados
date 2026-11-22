@@ -48,4 +48,30 @@ describe('Servicios', () => {
     ).map((el) => el.textContent);
     expect(titulos).toEqual(servicios.map((s) => s.data.titulo));
   });
+
+  it('numera las tarjetas de forma correlativa (01, 02, …) y cada una con su icono', () => {
+    const tarjetas = Array.from(
+      dom.window.document.querySelectorAll('[data-servicios-grid] > article'),
+    );
+    tarjetas.forEach((tarjeta, i) => {
+      expect(tarjeta.querySelector('[data-anim-numero]')?.textContent?.trim()).toBe(
+        String(i + 1).padStart(2, '0'),
+      );
+      expect(tarjeta.querySelector('[data-anim-icono] svg')).not.toBeNull();
+    });
+  });
+
+  it('cada servicio tiene un "orden" distinto (sin empates que desordenen la numeración)', async () => {
+    const ordenes = (await getCollection('servicios')).map((s) => s.data.orden);
+    expect(new Set(ordenes).size).toBe(ordenes.length);
+  });
+
+  it('incluye Derecho Disciplinario con su propio enlace de WhatsApp', () => {
+    const tarjeta = Array.from(
+      dom.window.document.querySelectorAll('[data-servicios-grid] > article'),
+    ).find((a) => a.querySelector('h3')?.textContent?.trim() === 'Derecho Disciplinario');
+    expect(tarjeta).toBeDefined();
+    const enlace = tarjeta?.querySelector('a[href^="https://wa.me/"]');
+    expect(decodeURIComponent(enlace?.getAttribute('href') ?? '')).toContain('disciplinario');
+  });
 });

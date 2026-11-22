@@ -9,11 +9,9 @@ formacion:
   - 'Diplomado en el papel de la defensa en el proceso penal acusatorio — Universidad UNISABANA (2015–2016)'
   - 'Conceptos básicos en ciencias forenses y criminalística — Universidad Cooperativa de Colombia (2009)'
 experiencia:
-  - 'Abogada litigante (2017 – actualidad)'
-  - 'Docente de tiempo completo en el área de Derecho Penal (2021 – 2022)'
-  - 'Abogada de apoyo a Concejal — Itagüí (2022)'
-  - 'Abogada — Corporación para el Manejo de los Bosques MASBOSQUES (2019 – 2022)'
-  - 'Abogada — Fundación Aulas de Paz (2019 – 2022)'
+  # Formato 'Título — Detalle' (sin periodo): se muestra con el título en
+  # negrita y el detalle debajo, ver src/lib/trayectoria.ts.
+  - '9 años de experiencia en entidades públicas y privadas — Lleva activamente procesos disciplinarios, penales, administrativos, de familia y civiles'
 especialidades:
   - 'Derecho Penal'
   - 'Derecho Administrativo'

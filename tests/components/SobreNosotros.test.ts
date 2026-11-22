@@ -97,4 +97,20 @@ describe('SobreNosotros', () => {
       expect(ficha.querySelector('.ficha-panel img.ficha-foto')).not.toBeNull();
     }
   });
+
+  it('resume la experiencia de Natalia (9 años, sin listar instituciones) como una sola entrada limpia', () => {
+    const experiencia = dom.window.document.querySelector(
+      'section[aria-label="Experiencia de Natalia Muñoz Taborda"]',
+    );
+    const hitos = experiencia?.querySelectorAll('li') ?? [];
+    expect(hitos).toHaveLength(1);
+    const [titulo, detalle] = Array.from(hitos[0].querySelectorAll('p')).map((p) =>
+      p.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    expect(titulo).toBe('9 años de experiencia en entidades públicas y privadas');
+    expect(detalle).toBe(
+      'Lleva activamente procesos disciplinarios, penales, administrativos, de familia y civiles',
+    );
+    expect(experiencia?.textContent).not.toMatch(/MASBOSQUES|Aulas de Paz|Concejal/);
+  });
 });

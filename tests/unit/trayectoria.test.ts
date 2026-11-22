@@ -48,4 +48,17 @@ describe('descomponerItemTrayectoria', () => {
       }
     }
   });
+
+  it('admite el formato "Título — Detalle" sin periodo (resumen de experiencia)', () => {
+    expect(
+      descomponerItemTrayectoria(
+        '9 años de experiencia en entidades públicas y privadas — Lleva activamente procesos disciplinarios, penales, administrativos, de familia y civiles',
+      ),
+    ).toEqual({
+      titulo: '9 años de experiencia en entidades públicas y privadas',
+      entidad:
+        'Lleva activamente procesos disciplinarios, penales, administrativos, de familia y civiles',
+      periodo: undefined,
+    });
+  });
 });
